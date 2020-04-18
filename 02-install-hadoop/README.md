@@ -215,7 +215,7 @@ $ bin/hbase shell
 ![](images/start-hbase.png)
 #### 配置伪分布模式（本次实验使用伪分布模式）
 
-##### 配置hbase-site.xml
+##### 1. 配置hbase-site.xml
 ```
 vim /usr/local/hbase/conf/hbase-site.xml
 ``` 
@@ -227,6 +227,10 @@ $ cd /usr/local/hbase/bin
 $ ./start-hbase.sh
 ```
 ![](images/hbase-ok.png)
+##### 2.查看DFS中Hbase 目录，自动创建
+```
+hdfs dfs -ls /hbase
+```
 ## 实验问题
 1. scp后找不到文件？  
 解决：进入/home文件查看，scp拷贝到了哪个权限，就在哪个权限的文件夹下
