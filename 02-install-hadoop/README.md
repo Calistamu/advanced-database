@@ -198,7 +198,7 @@ export PATH=$PATH:/usr/local/habse
 source ~/.bashrc
 ```
 #### HBase配置 
-* 单机配置（可能需要配置JAVA_HOME环境变量， 由于本实验指南在HADOOP安装时已配置，故省略）
+##### 单机配置（可能需要配置JAVA_HOME环境变量， 由于本实验指南在HADOOP安装时已配置，故省略。本次实验没有使用此配置方式。）
 ```
 # 配置hbase-site.xml文件
 vim /usr/local/hbase/conf/hbase-site.xml
@@ -213,14 +213,20 @@ $jps
 $ bin/hbase shell
 ```
 ![](images/start-hbase.png)
-#### 配置伪分布模式
-##### 配置hbase-env.sh
+#### 配置伪分布模式（本次实验使用伪分布模式）
+
+##### 配置hbase-site.xml
 ```
-cd /usr/local/hbase/conf/
-vim hbase-env.sh 
+vim /usr/local/hbase/conf/hbase-site.xml
 ``` 
 内容如下图：
 ![](images/hbaseenvsh.png)
+```
+$ start-dfs.sh
+$ cd /usr/local/hbase/bin
+$ ./start-hbase.sh
+```
+![](images/hbase-ok.png)
 ## 实验问题
 1. scp后找不到文件？  
 解决：进入/home文件查看，scp拷贝到了哪个权限，就在哪个权限的文件夹下
@@ -233,6 +239,10 @@ vim hbase-env.sh
 4. jps出现报错
 ![](jps-wrong.png)  
 解决：```sudo chown -R hadoop tmp```后再启动。
+5. ```./start-hbase.sh```没有java环境变量的报错,如下图所示：
+![](images/starthbase-wrong.png)  
+解决：
+![](images/starthbase-solution.png)
 ## 参考文献
 [hadoop](https://www.sas.com/en_us/insights/big-data/hadoop.html)  
 [Apahce hadoop](https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCluster.html)
