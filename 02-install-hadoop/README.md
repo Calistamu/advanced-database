@@ -207,7 +207,7 @@ vim /usr/local/hbase/conf/hbase-site.xml
 ![](images/hbasexml.png)
 ```
 采用如下命令启动服务、查看进程和启动客户端
-cd /usr/local/hbase
+$ cd /usr/local/hbase
 $ bin/start-hbase.sh
 $jps
 $ bin/hbase shell
@@ -229,7 +229,25 @@ $ ./start-hbase.sh
 ![](images/hbase-ok.png)
 ##### 2.查看DFS中Hbase 目录，自动创建
 ```
+#查看DFS中Hbase 目录，自动创建
 hdfs dfs -ls /hbase
+#用 localmaster-backup.sh启动. 为每个后背HMaster加一个16000端口之上的偏移量。 启动后可以查看结果。
+#停止将start改为stop
+./local-master-backup.sh start/stop 2 3 5
+#jps查看结果
+jps
+```
+结果如下图
+![](images/hmaster-start.png)
+```
+#启动和停止附加区域服务器RegionServers
+local-regionservers.sh start 2 3 4 5
+```
+结果如下图
+![](images/regionserver-start.png)
+```
+$ cd /usr/local/hbase
+$ bin/start-hbase.sh
 ```
 ## 实验问题
 1. scp后找不到文件？  
