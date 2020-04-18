@@ -65,7 +65,7 @@ export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
 ```
 hadoop安装成功如下图：
 ![](images/hadoop-ok.png)
-### 四、伪分布式配置
+#### 伪分布式配置
 伪分布式需要修改2个配置文件 core-site.xml 和 hdfs-site.xml 
 ```
 #进入配置文件所在文件夹
@@ -121,6 +121,106 @@ namenode格式化结果如下图：
 $ ./sbin/start-dfs.sh
 $ jps
 ```
+结果如下图所示：
+![](images/jps-ok.png)
+运行例子测试
+```
+创建执行MapReduce作业所需的 DFS 目录:
+
+  $ bin/hdfs dfs -mkdir /user
+  $ bin/hdfs dfs -mkdir /user/<username>     //<username> 问用户名，如hadoop
+
+拷贝输入文件到分布式文件系统:
+
+  $ bin/hdfs dfs  -put  etc/hadoop  input
+
+可以运行一些例子:
+
+  $ bin/hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-3.1.2.jar grep input output 'dfs[a-z.]+'
+
+查看输出的文件(files): 从分布式文件系统中拷贝文件到本地文件系统并查看:
+
+  $ bin/hdfs dfs -get output output
+  $ cat output/*
+
+或者直接在分布式文件系统上查看:
+
+  $ bin/hdfs dfs -cat output/*
+
+```
+比如，进入到'share/hadoop/mapreduce/'后执行```jar hadoop-mapreduce-examples-3.1.2.jar grep input output 'dfs[a-z.]+'```得到的结果如下图
+![](images/output-example.png)
+#### YARN 单机配置
+```
+# 进入配置文件的文件夹
+cd /usr/local/hadoop/etc/hadoop/ 
+
+# 配置mapred-site.xml如下 :
+<configuration>
+    <property>
+        <name>mapreduce.framework.name</name>
+        <value>yarn</value>
+    </property>
+</configuration>
+
+#配置yarn-site.xml如下
+<configuration>
+    <property>
+        <name>yarn.nodemanager.aux-services</name>
+        <value>mapreduce_shuffle</value>
+    </property>
+</configuration>
+
+#启动ResourceManager daemon 和 NodeManager daemon:
+$ sbin/start-yarn.sh
+
+#下列命令停止hadoop和YARN
+$ sbin/stop-dfs.sh
+$ sbin/stop-yarn.sh
+```
+### 四、安装Hbase和简单使用 
+```
+#解压安装包hbase-1.2.11-bin.tar.gz至路径 /usr/local，命令如下：
+sudo tar -zxvf  hbase-1.2.11-bin.tar.gz -C /usr/local
+#将解压的文件名hbase-1.2.11改为hbase，以方便使用，命令如下：
+sudo mv /usr/local/hbase-1.2.11  /usr/local/hbase
+cd /usr/local
+$ sudo chown -R hadoop ./hbase 
+#将hbase下的所有文件的所有者改为hadoop，hadoop是当前用户的用户名。
+
+#配置环境变量
+vim ~/.bashrc
+#添加以下代码：
+export SPARK_HOME=/usr/local/spark
+export PATH=$PATH:${SPARK_HOME}/bin
+export PATH=$PATH:/usr/local/habse
+#使设置生效
+source ~/.bashrc
+```
+#### HBase配置 
+* 单机配置（可能需要配置JAVA_HOME环境变量， 由于本实验指南在HADOOP安装时已配置，故省略）
+```
+# 配置hbase-site.xml文件
+vim /usr/local/hbase/conf/hbase-site.xml
+```
+如下图配置
+![](images/hbasexml.png)
+```
+采用如下命令启动服务、查看进程和启动客户端
+cd /usr/local/hbase
+$ bin/start-hbase.sh
+$jps
+$ bin/hbase shell
+```
+![](images/start-hbase.png)
+#### 配置伪分布模式
+##### 配置hbase-env.sh
+```
+cd /usr/local/hbase/conf/
+vim hbase-env.sh 
+``` 
+内容如下图：
+![](images/hbaseenvsh.png)
 ## 实验问题
 1. scp后找不到文件？  
 解决：进入/home文件查看，scp拷贝到了哪个权限，就在哪个权限的文件夹下
@@ -132,6 +232,7 @@ $ jps
 [参考](https://segmentfault.com/a/1190000020378682)
 4. jps出现报错
 ![](jps-wrong.png)  
-解决：
+解决：```sudo chown -R hadoop tmp```后再启动。
 ## 参考文献
-[hadoop](https://www.sas.com/en_us/insights/big-data/hadoop.html)
+[hadoop](https://www.sas.com/en_us/insights/big-data/hadoop.html)  
+[Apahce hadoop](https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCluster.html)
