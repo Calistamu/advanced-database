@@ -231,6 +231,14 @@ $ ./start-hbase.sh
 ```
 #查看DFS中Hbase 目录，自动创建
 hdfs dfs -ls /hbase
+```
+```
+#启动和停止附加区域服务器RegionServers
+./local-regionservers.sh start 2 3 4 5
+```
+结果如下图
+![](images/regionserver-start.png)
+```
 #用 localmaster-backup.sh启动. 为每个后背HMaster加一个16000端口之上的偏移量。 启动后可以查看结果。
 #停止将start改为stop
 ./local-master-backup.sh start/stop 2 3 5
@@ -239,16 +247,23 @@ jps
 ```
 结果如下图
 ![](images/hmaster-start.png)
-```
-#启动和停止附加区域服务器RegionServers
-local-regionservers.sh start 2 3 4 5
-```
-结果如下图
-![](images/regionserver-start.png)
+
 ```
 $ cd /usr/local/hbase
 $ bin/start-hbase.sh
 ```
+进入hbase shell,结果如下图所示
+![](images/hbaseshell.png) 
+##### 3.进行一些基本数据库操作
+![](images/shell-try1.png)
+还有修改表模式，使用alter命令，如修改存储版本数
+```
+hbase(main):007:0>disable ’test’ 
+hbase(main):007:0>alter ’test’, NAME=>’cf’,VERSIONS=>5
+hbase(main):007:0>enable ’test’
+```
+其他命令 disable table, drop table,enable table 等。
+
 ## 实验问题
 1. scp后找不到文件？  
 解决：进入/home文件查看，scp拷贝到了哪个权限，就在哪个权限的文件夹下
@@ -265,6 +280,23 @@ $ bin/start-hbase.sh
 ![](images/starthbase-wrong.png)  
 解决：
 ![](images/starthbase-solution.png)
+6. 进入hbase shell以后第一步创建表，出现格式报错
+![](images/hbaseshell-wrong.png)
+解决：先启动regionserver再启动hmaster。  
+[参考](https://community.cloudera.com/t5/Support-Questions/org-apache-hadoop-hbase-PleaseHoldException-Master-is/td-p/131710)
+## 实验结论
+1. 请问伪分布和分布式的含义有何不同？就本实验，你是如何理解在一台计算机上做到“伪分布”的？  
+答：伪分布是逻辑上的分布，实际上是在一个物理机上操作。分布式是物理机上分布，逻辑上集中。  
+以本次实验为例，之前的实验是一个物理机为master，其余物理机当数据节点，而这次实验，是在一个物理机上实现了既有master又有数据节点。
+2. 在1.2小节进行安装SSH并设置SSH无密码登陆，请问这个安装的目的是什么？  
+答：为了不需密码即可登录localhost。如果失败则可以搜索SSH免密码登录来寻求答案
+3. 如果继续向Hbase的test表中put行键为”row1”，值为其它字符串的数据，put ‘test’ ,’row1’, ‘cf:a’, ‘value6’，会发生什么？如果采用语句get ‘test’, ‘row1’, {COLUMN=>’cf:a’, VERSIONS=>3} 进行查询，分析你得到的结果。put与关系数据库的插入有何不同？  
+题目中的实验执行结果如下图所示：
+![](images/put-result.png)  
+put与关系数据库的插入不同：HBase数据插入使用Put对象，Put对象在进行数据插入时，首先会想Hbase集群发送一个RPC请求，得到响应后将Put类中的数据通过序列化的方式传给HBase集群，集群节点拿到数据后进行添加功能。  
+或：Put类中主要含有一个KeyValue对象数组，KeyValue对象是HBase底层存储的一个重要类，代表了数据在底层存储时的状态。KeyValue对象代表了一个Hbase表中的一个数据单元，即含有行值（row）、列簇（family）、列（column）、时间戳（timestamp）和值（value），从这些信息能够在表中唯一确定一个数据单元。在KeyValue对象中，Key（键）包含了一个value值的row、family、column和timestamp信息，而value则是该表单元格的数据。  当插入一条数据时，其实就是讲KeyValue进行序列化后，然后传递后Hbase集群，集群在根据KeyValue的值进行相应的操作。  
+而关系数据库没有这样的过程，直接根据属性插入。
 ## 参考文献
 [hadoop](https://www.sas.com/en_us/insights/big-data/hadoop.html)  
-[Apahce hadoop](https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCluster.html)
+[Apahce hadoop](https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCluster.html)  
+[hbase](https://hbase.apache.org/book.html)
