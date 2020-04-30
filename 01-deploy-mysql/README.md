@@ -3,7 +3,7 @@
 virtualbox+ubuntu-16.04-server(两个)  
 ubuntu双网卡配置：NAT+host-only
 * 如果没有开启host-only.```sudo vi /etc/network/interfaces```在其中添加```auto enp0s8```和```iface enp0s8 inet dhcp```，最后```sudo /etc/init.d/networking restart```重启网络
-
+  
 ![](images/network.png)
 ## 实验步骤
 1. 下载安装VM ware12.5.9并安装，运行输入激活许可证。
@@ -101,7 +101,7 @@ Shell> sudo systemctl start ndb_mgmd
 可以通过如下语句验证NDB Cluster Management service服务正在执行：
 Shell>sudo systemctl status ndb_mgmd
 ```
-如果开启了自启动，看到如下结果
+如果开启了自启动，看到如下结果  
 ![](images/ndbmgmd-auto.png)
 
 5. 配置数据节点(192.168.57.111和192.168.57.110上都进行)
@@ -122,7 +122,7 @@ sudo mkdir -p /usr/local/mysql/data
 # 然后就可以启动服务了：
 sudo ndbd
 ```
-NDB 数据节点守护程序成功启动
+NDB 数据节点守护程序成功启动  
 ![](images/deploy-ok.png)
 配置数据节点服务自启动
 * 如果开启了自启动，前面的结果就不会出现，是正常的，并且使用```sudo ps -A```会看到两个ndbd进程
@@ -158,7 +158,7 @@ sudo systemctl start ndbd
 # 可以通过如下语句验证NDB Cluster Management service服务正在执行：
 sudo systemctl status ndbd
 ```
-status如下图所示
+status如下图所示  
 ![](images/ndbd-auto.png)
 这表明MySQL Cluster 数据节点守护进程作为一个 systemd service在运行. 数据节点起作用并能够连接到MySQL Cluster Manager.  
 
@@ -237,7 +237,7 @@ SELECT * FROM test_table;
 解决：因为另一个虚拟机中的数据库没有搭好，将步骤中的5也在另一台中操作一遍
 ## 实验结论
 1. 在本例中，数据被插入到了哪个机器？  
-根据实验结果发现，集群中的数据库操作是同步的。比如在server创建了数据库clustertest并创表插入数据，而client也能使用该库并查询数据。在client创建数据库，立刻server（为一个数据节点）就可以使用这个名为'servercopytry'的库
+根据实验结果发现，集群中的数据库操作是同步的。比如在server创建了数据库clustertest并创表插入数据，而client也能使用该库并查询数据。在client创建数据库，立刻server（为一个数据节点）就可以使用这个名为'servercopytry'的库  
 ![](images/results.png)
 2. 通过实验，你对一个分布式数据库系统有何理解？分布式数据库系统预计有何优越性？  
 理解:分布式数据库物理上分离（位于不同的主机），但是逻辑同步（操作同步）  

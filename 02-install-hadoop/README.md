@@ -22,7 +22,7 @@ $ ssh-keygen -t rsa                     #三次回车
 $ cat ./id_rsa.pub >> ./authorized_keys     #加入授权
 $ ssh localhost                         #此时已不需密码即可登录localhost
 ```
-实验效果如下图：
+实验效果如下图：  
 ![](images/ssh.png)
 ### 二、安装jdk1.8
 ```
@@ -40,13 +40,13 @@ export CLASSPATH=.:${JAVA_HOME}/lib:${JRE_HOME}/lib:$CLASSPATH
 export PATH=${JAVA_HOME}/bin:$PATH
 
 ```
-.bashrc文件修改如图所示：
+.bashrc文件修改如图所示：  
 ![](images/change-bashrc.png)
 ```
 $ source ~/.bashrc                       #使新配置的环境变量生效
 $ java -version                          #检测是否安装成功，查看java版本
 ```
-安装成功显示如下图：
+安装成功显示如下图：  
 ![](images/javajdk-ok.png)
 ### 三、安装hadoop-3.1.2
 ```
@@ -63,7 +63,7 @@ export HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_HOME/lib/native
 export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
 
 ```
-hadoop安装成功如下图：
+hadoop安装成功如下图：    
 ![](images/hadoop-ok.png)
 #### 伪分布式配置
 伪分布式需要修改2个配置文件 core-site.xml 和 hdfs-site.xml 
@@ -114,14 +114,14 @@ vim hdfs-site.xml
 # 执行 NameNode 的格式化
 $ ./bin/hdfs namenode –format
 ```
-namenode格式化结果如下图：
+namenode格式化结果如下图：  
 ![](images/namenode.png)
 ```
 # 启动namenode和datanode进程，并查看启动结果
 $ ./sbin/start-dfs.sh
 $ jps
 ```
-结果如下图所示：
+结果如下图所示：  
 ![](images/jps-ok.png)
 运行例子测试
 ```
@@ -148,7 +148,7 @@ $ jps
   $ bin/hdfs dfs -cat output/*
 
 ```
-比如，进入到'share/hadoop/mapreduce/'后执行```jar hadoop-mapreduce-examples-3.1.2.jar grep input output 'dfs[a-z.]+'```得到的结果如下图
+比如，进入到'share/hadoop/mapreduce/'后执行```jar hadoop-mapreduce-examples-3.1.2.jar grep input output 'dfs[a-z.]+'```得到的结果如下图  
 ![](images/output-example.png)
 #### YARN 单机配置
 ```
@@ -203,7 +203,7 @@ source ~/.bashrc
 # 配置hbase-site.xml文件
 vim /usr/local/hbase/conf/hbase-site.xml
 ```
-如下图配置
+如下图配置  
 ![](images/hbasexml.png)
 ```
 采用如下命令启动服务、查看进程和启动客户端
@@ -211,7 +211,7 @@ $ cd /usr/local/hbase
 $ bin/start-hbase.sh
 $jps
 $ bin/hbase shell
-```
+```  
 ![](images/start-hbase.png)
 #### 配置伪分布模式（本次实验使用伪分布模式）
 
@@ -219,13 +219,13 @@ $ bin/hbase shell
 ```
 vim /usr/local/hbase/conf/hbase-site.xml
 ``` 
-内容如下图：
+内容如下图：  
 ![](images/hbaseenvsh.png)
 ```
 $ start-dfs.sh
 $ cd /usr/local/hbase/bin
 $ ./start-hbase.sh
-```
+```  
 ![](images/hbase-ok.png)
 ##### 2.查看DFS中Hbase 目录，自动创建
 ```
@@ -236,7 +236,7 @@ hdfs dfs -ls /hbase
 #启动和停止附加区域服务器RegionServers
 ./local-regionservers.sh start 2 3 4 5
 ```
-结果如下图
+结果如下图  
 ![](images/regionserver-start.png)
 ```
 #用 localmaster-backup.sh启动. 为每个后背HMaster加一个16000端口之上的偏移量。 启动后可以查看结果。
@@ -245,17 +245,17 @@ hdfs dfs -ls /hbase
 #jps查看结果
 jps
 ```
-结果如下图
+结果如下图  
 ![](images/hmaster-start.png)
 
 ```
 $ cd /usr/local/hbase
 $ bin/start-hbase.sh
 ```
-进入hbase shell,结果如下图所示
+进入hbase shell,结果如下图所示  
 ![](images/hbaseshell.png) 
 ##### 3.进行一些基本数据库操作
-![](images/shell-try1.png)
+![](images/shell-try1.png)  
 还有修改表模式，使用alter命令，如修改存储版本数
 ```
 hbase(main):007:0>disable ’test’ 
@@ -267,21 +267,21 @@ hbase(main):007:0>enable ’test’
 ## 实验问题
 1. scp后找不到文件？  
 解决：进入/home文件查看，scp拷贝到了哪个权限，就在哪个权限的文件夹下
-2. namenode格式化使出错，报错如下图
-![](images/namenode-wrong.png)
+2. namenode格式化使出错，报错如下图  
+![](images/namenode-wrong.png)  
 解决：文件内容写错了，排除了一遍后解决。
 3. namenode格式化Logs文件夹权限出错  
 解决：```sudo chmod -R 777 /usr/local/hadoop/logs```  
 [参考](https://segmentfault.com/a/1190000020378682)
-4. jps出现报错
-![](jps-wrong.png)  
+4. jps出现报错  
+![](jps-wrong.png)    
 解决：```sudo chown -R hadoop tmp```后再启动。
-5. ```./start-hbase.sh```没有java环境变量的报错,如下图所示：
-![](images/starthbase-wrong.png)  
+5. ```./start-hbase.sh```没有java环境变量的报错,如下图所示：  
+![](images/starthbase-wrong.png)     
 解决：
-![](images/starthbase-solution.png)
-6. 进入hbase shell以后第一步创建表，出现格式报错
-![](images/hbaseshell-wrong.png)
+![](images/starthbase-solution.png)  
+6. 进入hbase shell以后第一步创建表，出现格式报错  
+![](images/hbaseshell-wrong.png)  
 解决：先启动regionserver再启动hmaster。  
 [参考](https://community.cloudera.com/t5/Support-Questions/org-apache-hadoop-hbase-PleaseHoldException-Master-is/td-p/131710)
 ## 实验结论
