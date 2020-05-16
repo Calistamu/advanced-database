@@ -7,7 +7,13 @@
 - [] 4.	系统可以支持未来数据量的大幅增加。
 - [] 5.	各组尽可能地做查询速度的优化，并在最后提交的文档中包含测试结果。
 ## 实验环境
+python+flask+mysql cluster8.0.20(win10)的web数据库应用程序
 ## 实验步骤
+### windows上下载并配置Mysql Cluster
+1. 下载[mysql cluster 64bit ZIP](https://dev.mysql.com/downloads/cluster/)
+2. 
 ## 实验问题
 ## 实验总结
 ## 参考文献
+[【MySQL集群】——在Windows环境下配置MySQL集群](https://blog.csdn.net/huyuyang6688/article/details/47441743)  
+[MySQL Cluster: Getting Started](https://www.mysql.com/products/cluster/start.html)
