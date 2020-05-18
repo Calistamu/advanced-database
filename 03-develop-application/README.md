@@ -86,19 +86,31 @@ FLUSH PRIVILEGES;
 3. 建库名为'movies'  
 ```create database movies；```
 ![](images/show-database.png)
-4. 建库建表
+4. 建库建表导入数据
 ```
 create database movies;
 user movies;
 
 create table genomescores (movieId int,tagId int,relevance varchar(100))engine=ndbcluster;
 ```
+将数据cp到/var/lib/mysql-files/内
+```
+mysql> load data infile '/var/lib/mysql-files/genome-scores.csv'
+    -> into table genomescores
+    -> fields terminated by ',' optionally enclosed by '"' escaped by '"'
+    -> lines terminated by '\r\n'
+    -> ignore 1 lines
+    -> (movieId,tagId,relevance); 
+```
 ### 四、前端搭建
 ## 实验问题
-1. 远程访问虚拟机数据时```grant all privileges on *.* to user@'%' identified by 'password';```一直报错。    
+### 1. 物理机连接虚拟机报错
+远程访问虚拟机数据时```grant all privileges on *.* to user@'%' identified by 'password';```一直报错。    
 ![](images/wrong1.png)  
 解决：因为没有create该用户，先create再授权。 而且一开始没有好好理解比如问题语句其中'user'和'%'的含义。   
-2. 导入.csv文件时遇到的问题与解决：  
+
+### 2. 导入genome-scores.csv文件时遇到的问题与解决：  
+
 建表正确命令：```create table genomescores (movieId int,tagId int,relevance double,primary key (movieId))engine=ndbcluster;```  
 不需要''否则会报错，如下图。  
 ![](images/wrong2.png) 
@@ -108,7 +120,9 @@ create table genomescores (movieId int,tagId int,relevance varchar(100))engine=n
 ![](images/wrong3.png)  
 问题分析：多次尝试，参考[ERROR 1064 (42000): You have an error in your SQL syntax](https://blog.csdn.net/w1346561235/article/details/74502807)发现并不是语法的错误。
 解决：参考[MySQL load data infile ERROR 1064](https://dba.stackexchange.com/questions/249637/mysql-load-data-infile-error-1064)，对'/etc/my.cnf'进行修改后保存,使用```service mysql restart```重启Mysql。修改后的/etc/my.cnf如下图所示：
+
 * 之后解决table full时发现，此处更改没有效果是因为/etc/mysql/my.cnf还有一个文件，更改错了。
+
 ![](images/wrong5.png)  
 再次进入mysql，```show variables like "local_infile";```查看设置，发现没有成功,使用```set global local_infile=1;```后再次查看成功了。再次导入数据也没有出现这个错误。
 ![](images/wrong6.jpg)   
@@ -132,13 +146,39 @@ create table genomescores (movieId int,tagId int,relevance varchar(100))engine=n
 ![](images/wrong12.png)  
 最后出现了'table full'的问题。  
 ![](images/wrong13.png)
-如下图更改/etc/mysql/my.cnf:  
+如下图更改/etc/mysql/my.cnf和/etc/my.cnf: 
+* tmp_table_size 控制内存临时表的最大值，超过限值后就往硬盘写，写的位置由变量tmpdir决定。
+* max_heap_table_size 用户可以创建的内存表(memory table)的大小.这个值用来计算内存表的最大行数值。 
+
+解决：[mysql 解决 ERROR 1114 (HY000): The table 'XXX' is full](https://www.cnblogs.com/wf-l5201314/p/11526452.html)
 ![](images/wrong14.png)  
 看到内存确实更改。  
-![](images/wrong15.png)
+![](images/wrong15.png)  
+再次插入数据这个报错都还是有,现代告我们是mysql cluster，会不会数据管理上不一样，确实是的。```sudo vim /var/lib/mysql-cluster/config.ini```
+* DataMemory：设定用于存放数据和主键索引的内存段的大小。这个大小限制了能存放的数据的大小，因为ndb存储引擎需属于内存数据库引擎，需要将所有的数据（包括索引）都load到内存中。这个参数并不是一定需要设定的，但是默认值非常小（80M），只也就是说如果使用默认值，将只能存放很小的数据。参数设置需要带上单位，如512M，2G等。另外，DataMemory里面还会存放UNDO相关的信息，所以，事务的大小和事务并发量也决定了DataMemory的使用量，建议尽量使用小事务；
+
+* IndexMemory：设定用于存放索引（非主键）数据的内存段大小。和DataMemory类似，这个参数值的大小同样也会限制该节点能存放的数据的大小，因为索引的大小是随着数据量增长而增长的。参数设置也如DataMemory一样需要单位。IndexMemory默认大小为18M；
+
+* 实际上，一个NDB节点能存放的数据量是会受到DataMemory和IndexMemory两个参数设置的约束，两者任何一个达到限制数量后，都无法再增加能存储的数据量。如果继续存入数据系统会报错“table is full”。
 ## 实验总结
+1. 关于修改了my.cnf不生效问题总结。  
+参考：[修改my.cnf配置不生效](https://www.kancloud.cn/thinkphp/mysql-faq/47452)  
+MySQL读取各个my.cnf配置文件的先后顺序是：
+* /etc/my.cnf
+* /etc/mysql/my.cnf
+* /usr/local/mysql/etc/my.cnf
+* ~/.my.cnf
+* 其他自定义路径下的my.cnf，例如：/data/mysql/yejr_3306/my.cnf
 
+不管是mysqld服务器端程序，还是mysql客户端程序，都可以采用下面两个参数来自行指定要读取的配置文件路径：
 
+* –defaults-file=#， 只读取指定的文件（不再读取其他配置文件）
+* –defaults-extra-file=#， 从其他优先级更高的配置文件中读取全局配置后，再读取指定的配置文件（有些选项可以覆盖掉全局配置从的设定值）
+2. 更改设置的时候出现了mysql和mysqld,傻傻分不清楚。  
+参考：[mysqld — The MySQL Server](https://dev.mysql.com/doc/refman/8.0/en/mysqld.html)    
+区分总结：mysqld 是服务端程序。
+mysql是命令行客户端程序。
+3. 关于一个应用的启动、停止、重启都有service或脚本启动两种方式。  
 ## 参考文献
 [【MySQL集群】——在Windows环境下配置MySQL集群](https://blog.csdn.net/huyuyang6688/article/details/47441743)  
 [MySQL Cluster: Getting Started](https://www.mysql.com/products/cluster/start.html)  
@@ -152,4 +192,5 @@ create table genomescores (movieId int,tagId int,relevance varchar(100))engine=n
 [ndb_import — Import CSV Data Into NDB](https://s0dev0mysql0com.icopy.site/doc/mysql-cluster-excerpt/5.7/en/mysql-cluster-programs-ndb-import.html)  
 [LOAD DATA Statement](https://dev.mysql.com/doc/refman/5.6/en/load-data.html)  
 [csv文件导入Mysql](https://blog.csdn.net/quiet_girl/article/details/71436108)  
-[MySQL 使用 LOAD DATA 导入 csv 文件](https://blog.csdn.net/liqfyiyi/article/details/78831322)  
+[MySQL 使用 LOAD DATA 导入 csv 文件](https://blog.csdn.net/liqfyiyi/article/details/78831322)   
+[MySQL Cluster配置详细介绍（config.ini）](https://www.linuxidc.com/Linux/2010-06/26640.htm)
