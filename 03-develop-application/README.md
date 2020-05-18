@@ -11,6 +11,7 @@ python3.7.3+flask0.12.2+mysql cluster8.0.19(win10)的web数据库应用程序
 ![](images/version.png)
 ## 实验步骤
 ### 一. 在实验01-deploy-mysql的基础上配置mysql cluster，开启mysql cluster(配置时使用自启动)并确保一切正常。
+服务器虚拟机（也是一个数据节点）执行：  
 ```
 # 杀掉正在运行的服务
 sudo pkill -f ndb_mgmd
@@ -25,7 +26,7 @@ Shell> sudo systemctl start ndb_mgmd
 Shell>sudo systemctl status ndb_mgmd
 
 
-# 最后，启动服务：
+# 最后，启动数据节点服务：
 sudo systemctl start ndbd
 # 可以通过如下语句验证NDB Cluster Management service服务正在执行：
 sudo systemctl status ndbd
@@ -41,6 +42,13 @@ SHOW ENGINE NDB STATUS \G
 # 查看集群信息
 ndb_mgm
 SHOW
+```
+数据节点虚拟机执行：  
+```
+# 最后，启动数据节点服务：
+sudo systemctl start ndbd
+# 可以通过如下语句验证NDB Cluster Management service服务正在执行：
+sudo systemctl status ndbd
 ```
 ### 二. 配置物理机远程连接虚拟机中的数据库,使用test.py进行数据测试。
 >数据测试代码文件：code/test.py
@@ -71,14 +79,63 @@ FLUSH PRIVILEGES;
 3. 最后测试成功，看到打印出的数据，确实是当初插入其中的数据。(数据是在实验01-deploy-mysql中插入的数据) 
 ![](images/data-test.png)
 ### 三、虚拟机中导入数据
+* 为避免操作失误导致系统崩溃，快照一下
 1. 下载老师给的数据包，将文件另存为ANSI编码
 ![](images/change-to-ANSI.png)  
-2. 
+2. ssh文件传入虚拟机  
+3. 建库名为'movies'  
+```create database movies；```
+![](images/show-database.png)
+4. 建库建表
+```
+create database movies;
+user movies;
+
+create table genomescores (movieId int,tagId int,relevance varchar(100))engine=ndbcluster;
+```
 ### 四、前端搭建
 ## 实验问题
 1. 远程访问虚拟机数据时```grant all privileges on *.* to user@'%' identified by 'password';```一直报错。    
 ![](images/wrong1.png)  
 解决：因为没有create该用户，先create再授权。 而且一开始没有好好理解比如问题语句其中'user'和'%'的含义。   
+2. 导入.csv文件时遇到的问题与解决：  
+建表正确命令：```create table genomescores (movieId int,tagId int,relevance double,primary key (movieId))engine=ndbcluster;```  
+不需要''否则会报错，如下图。  
+![](images/wrong2.png) 
+尝试用ndb_import向ndb中导入.csv的方式报错，此方法不可。于是采用向mysql导入.csv的方式。 
+![](images/wrong4.png)
+插入数据error1064报错，如下图。  
+![](images/wrong3.png)  
+问题分析：多次尝试，参考[ERROR 1064 (42000): You have an error in your SQL syntax](https://blog.csdn.net/w1346561235/article/details/74502807)发现并不是语法的错误。
+解决：参考[MySQL load data infile ERROR 1064](https://dba.stackexchange.com/questions/249637/mysql-load-data-infile-error-1064)，对'/etc/my.cnf'进行修改后保存,使用```service mysql restart```重启Mysql。修改后的/etc/my.cnf如下图所示：
+* 之后解决table full时发现，此处更改没有效果是因为/etc/mysql/my.cnf还有一个文件，更改错了。
+![](images/wrong5.png)  
+再次进入mysql，```show variables like "local_infile";```查看设置，发现没有成功,使用```set global local_infile=1;```后再次查看成功了。再次导入数据也没有出现这个错误。
+![](images/wrong6.jpg)   
+再次导入数据，出现'secure_file-priv'的报错：  
+![](images/wrong7.png)  
+分析：查看该变量值为空，那么就更改为我们想要的文件夹的位置。
+解决：参考[Mysql 导入文件提示 --secure-file-priv option 问题](https://www.cnblogs.com/Braveliu/p/10728162.html)和[How should I tackle --secure-file-priv in MySQL?](https://stackoverflow.com/questions/32737478/how-should-i-tackle-secure-file-priv-in-mysql),在'etc/my.cnf'中进行如下图设置。保存后```service mysql restart```重启mysql。
+![](images/wrong8.png) 
+* 注意是[mysqld]而不是[mysql]    
+
+再次进入mysql，```show variables like "secure_file_priv"```查看变量值，出现了一个值。
+![](images/wrong9.png)  
+* 在这里多次尝试，无论secure_file-priv为空还是固定的文件夹都还是会显示默认的'/var/lib/mysql-files/'
+
+于是想着把数据cp到该默认文件夹内，再导入。出现了'Permission denied'。多次尝试失败后，参考[ubuntu下操作目录，出现Permission denied的解决办法](https://blog.csdn.net/zhengxiangwen/article/details/50625986),更改了'/var/lib/mysql-files'文件夹的权限，cp成功。操作结果如下图：    
+![](images/wrong10.png)
+
+再次插入数据，出现'ERROR 1265 (01000): Data truncated for column 'relevance' at row 1'报错。参考[Mysql 更新字段类型异常处理:ERROR 1265 (01000): Data truncated for column 'xxx' at row 1](https://blog.csdn.net/chwshuang/article/details/54945485)对数据进行更新，此办法失败。于是删表重建表，将'relevance'类型定义为varchar(20)。再次插入数据，出现某一行数据过长的报错,'ERROR 1406 (22001): Data too long for column 'relevance' at row 104'，删表重建表，将'relevance'类型定义为varchar(100)，此问题解决。
+![](images/wrong11.png)  
+再次插入数据，出现双键报错'ERROR 1022 (23000): Can't write; duplicate key in table 'genomescores''，更改创建表语句，不使用primary key。正确语句为：```create table genomescores (movieId int,tagId int,relevance varchar(100))engine=ndbcluster;```
+![](images/wrong12.png)  
+最后出现了'table full'的问题。  
+![](images/wrong13.png)
+如下图更改/etc/mysql/my.cnf:  
+![](images/wrong14.png)  
+看到内存确实更改。  
+![](images/wrong15.png)
 ## 实验总结
 
 
@@ -91,4 +148,8 @@ FLUSH PRIVILEGES;
 [Differences Between MySQL vs MongoDB](https://www.educba.com/mysql-vs-mongodb/)  
 [Differences Between MongoDB and HBase](https://www.educba.com/mongodb-vs-hbase/)  
 [What is MySQL NDB Cluster?](https://www.apress.com/us/blog/all-blog-posts/what-is-mysql-ndb-cluster/15454530)  
-[MySQL Cluster CGE ](https://www.mysql.com/products/cluster/)
+[MySQL Cluster CGE ](https://www.mysql.com/products/cluster/)  
+[ndb_import — Import CSV Data Into NDB](https://s0dev0mysql0com.icopy.site/doc/mysql-cluster-excerpt/5.7/en/mysql-cluster-programs-ndb-import.html)  
+[LOAD DATA Statement](https://dev.mysql.com/doc/refman/5.6/en/load-data.html)  
+[csv文件导入Mysql](https://blog.csdn.net/quiet_girl/article/details/71436108)  
+[MySQL 使用 LOAD DATA 导入 csv 文件](https://blog.csdn.net/liqfyiyi/article/details/78831322)  
