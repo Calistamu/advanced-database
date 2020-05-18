@@ -46,7 +46,7 @@ SHOW
 >数据测试代码文件：code/test.py
 1. virtualbox中进行如下设置：  
 ![](images/virtual-set.png)
-2. 运行python依然得到报错信息：'Host 'xxx.xx.xxx.xxx' is not allowed to connect to this MySQL server'.  
+2. 运行python依然得到报错信息：'Host '192.168.57.1' is not allowed to connect to this MySQL server'.  
 解决：参考[Host 'xxx.xx.xxx.xxx' is not allowed to connect to this MySQL server](https://stackoverflow.com/questions/1559955/host-xxx-xx-xxx-xxx-is-not-allowed-to-connect-to-this-mysql-server)对mysql cluster进行授权  
 ```
 # 在虚拟机中操作
@@ -71,7 +71,10 @@ FLUSH PRIVILEGES;
 3. 最后测试成功，看到打印出的数据，确实是当初插入其中的数据。(数据是在实验01-deploy-mysql中插入的数据) 
 ![](images/data-test.png)
 ### 三、虚拟机中导入数据
-### 四、
+1. 下载老师给的数据包，将文件另存为ANSI编码
+![](images/change-to-ANSI.png)  
+2. 
+### 四、前端搭建
 ## 实验问题
 1. 远程访问虚拟机数据时```grant all privileges on *.* to user@'%' identified by 'password';```一直报错。    
 ![](images/wrong1.png)  
