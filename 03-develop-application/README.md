@@ -194,6 +194,7 @@ MySQL读取各个my.cnf配置文件的先后顺序是：
 区分总结：mysqld 是服务端程序。
 mysql是命令行客户端程序。
 3. 关于一个应用的启动、停止、重启都有service或脚本启动两种方式。  
+4. 使用虚拟机时分配的内存不能过大，超出了物理机的能力，虚拟机会报错，而且物理机响声很大，容易烧板。
 ## 参考文献
 [【MySQL集群】——在Windows环境下配置MySQL集群](https://blog.csdn.net/huyuyang6688/article/details/47441743)  
 [MySQL Cluster: Getting Started](https://www.mysql.com/products/cluster/start.html)  
