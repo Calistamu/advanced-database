@@ -102,10 +102,7 @@ mysql> load data infile '/var/lib/mysql-files/genome-scores.csv'
     -> ignore 1 lines
     -> (movieId,tagId,relevance); 
 ```
-3. 使用以下方法对.vdi进行扩容  
-![](images/expand-vdi.png)  
-扩容后的前后对比  
-![](images/expand-vs.jpg)
+
 ### 四、前端搭建
 ## 实验问题
 ### 1. 物理机连接虚拟机报错
@@ -175,11 +172,18 @@ mysql> load data infile '/var/lib/mysql-files/genome-scores.csv'
 * ```sudo ndb_mgmd -f /var/lib/mysql-cluster/config.ini --reload```一开始执行此命令，设置的config.ini一直没生效，因为少了--initial,后来想想确实应该initial，是要还原设置再重新配置。
 
 ![](images/wrong17.png)
+扩容前后大小对比图：  
+![](images/wrong19.jpg)
 ### 4. 关于虚拟机的内存大小分配 
 使用虚拟机时分配的内存不能过大，超出了物理机的能力，虚拟机会报错，而且物理机响声很大，差点烧板。  
 但是也不能太小，不然数据节点就无法同时启用，启动的时候就看见两个机器的进程接着kill。  
-多次尝试找到刚刚好的就行，烧板声音太吓人。
+多次尝试找到刚刚好的就行，刚刚好即开机后不再显示有xxx killed的信息，烧板声音太吓人。
 ![](images/wrong18.png)
+### 5. 虚拟机硬盘大小不够扩容办法
+使用以下方法对.vdi进行扩容  
+![](images/expand-vdi.png)  
+.vdi扩容后的前后对比  
+![](images/expand-vs.jpg)
 ## 实验总结
 1. 关于修改了my.cnf不生效问题总结。  
 参考：[修改my.cnf配置不生效](https://www.kancloud.cn/thinkphp/mysql-faq/47452)  
