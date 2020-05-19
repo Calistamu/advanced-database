@@ -140,7 +140,9 @@ create table genometags(tagId int,tag varchar(40))engine=ndbcluster;
 # ratings.csv
 create table ratings(userId int,movieId int,rating double,timestamp long)engine=ndbcluster;
 ```
+![](images/insert-7.png)  
 此'movies'数据库中的表结构如下图：  
+![](images/tables-info.png)
 
 
 
