@@ -102,6 +102,10 @@ mysql> load data infile '/var/lib/mysql-files/genome-scores.csv'
     -> ignore 1 lines
     -> (movieId,tagId,relevance); 
 ```
+3. 使用以下方法对.vdi进行扩容  
+![](images/expand-vdi.png)  
+扩容后的前后对比  
+![](images/expand-vs.jpg)
 ### 四、前端搭建
 ## 实验问题
 ### 1. 物理机连接虚拟机报错
@@ -154,12 +158,16 @@ mysql> load data infile '/var/lib/mysql-files/genome-scores.csv'
 ![](images/wrong14.png)  
 看到内存确实更改。  
 ![](images/wrong15.png)  
-再次插入数据这个报错都还是有,现代告我们是mysql cluster，会不会数据管理上不一样，确实是的。```sudo vim /var/lib/mysql-cluster/config.ini```
+再次插入数据这个报错都还是有,现代告我们是mysql cluster，会不会数据管理上不一样，确实是的。```sudo vim /var/lib/mysql-cluster/config.ini```如下图修改config.ini并保存。
 * DataMemory：设定用于存放数据和主键索引的内存段的大小。这个大小限制了能存放的数据的大小，因为ndb存储引擎需属于内存数据库引擎，需要将所有的数据（包括索引）都load到内存中。这个参数并不是一定需要设定的，但是默认值非常小（80M），只也就是说如果使用默认值，将只能存放很小的数据。参数设置需要带上单位，如512M，2G等。另外，DataMemory里面还会存放UNDO相关的信息，所以，事务的大小和事务并发量也决定了DataMemory的使用量，建议尽量使用小事务；
 
 * IndexMemory：设定用于存放索引（非主键）数据的内存段大小。和DataMemory类似，这个参数值的大小同样也会限制该节点能存放的数据的大小，因为索引的大小是随着数据量增长而增长的。参数设置也如DataMemory一样需要单位。IndexMemory默认大小为18M；
 
 * 实际上，一个NDB节点能存放的数据量是会受到DataMemory和IndexMemory两个参数设置的约束，两者任何一个达到限制数量后，都无法再增加能存储的数据量。如果继续存入数据系统会报错“table is full”。
+
+![](images/wrong16.png)
+使用```sudo ndb_mgmd --initial --reload --config-file=/var/lib/mysql-cluster/config.ini```让配置文件生效
+* ```sudo ndb_mgmd -f /var/lib/mysql-cluster/config.ini --reload```一开始执行此命令，设置的config.ini一直没生效，因为少了--initial,后来想想确实应该initial，是要还原设置再重新配置。
 ## 实验总结
 1. 关于修改了my.cnf不生效问题总结。  
 参考：[修改my.cnf配置不生效](https://www.kancloud.cn/thinkphp/mysql-faq/47452)  
