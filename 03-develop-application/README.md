@@ -175,6 +175,11 @@ mysql> load data infile '/var/lib/mysql-files/genome-scores.csv'
 * ```sudo ndb_mgmd -f /var/lib/mysql-cluster/config.ini --reload```一开始执行此命令，设置的config.ini一直没生效，因为少了--initial,后来想想确实应该initial，是要还原设置再重新配置。
 
 ![](images/wrong17.png)
+### 4. 关于虚拟机的内存大小分配 
+使用虚拟机时分配的内存不能过大，超出了物理机的能力，虚拟机会报错，而且物理机响声很大，差点烧板。  
+但是也不能太小，不然数据节点就无法同时启用，启动的时候就看见两个机器的进程接着kill。  
+多次尝试找到刚刚好的就行，烧板声音太吓人。
+![](images/wrong18.png)
 ## 实验总结
 1. 关于修改了my.cnf不生效问题总结。  
 参考：[修改my.cnf配置不生效](https://www.kancloud.cn/thinkphp/mysql-faq/47452)  
@@ -194,7 +199,7 @@ MySQL读取各个my.cnf配置文件的先后顺序是：
 区分总结：mysqld 是服务端程序。
 mysql是命令行客户端程序。
 3. 关于一个应用的启动、停止、重启都有service或脚本启动两种方式。  
-4. 使用虚拟机时分配的内存不能过大，超出了物理机的能力，虚拟机会报错，而且物理机响声很大，容易烧板。
+
 ## 参考文献
 [【MySQL集群】——在Windows环境下配置MySQL集群](https://blog.csdn.net/huyuyang6688/article/details/47441743)  
 [MySQL Cluster: Getting Started](https://www.mysql.com/products/cluster/start.html)  
