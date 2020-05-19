@@ -75,6 +75,7 @@ sudo ndb_mgmd -f /var/lib/mysql-cluster/config.ini
 可以使ndb_mgmd自动加载，使用下列命令，不配置自动加载不影响对集群的认识，自动加载更符合实际。本次实验均设置了自启动。
 ```
 # 编辑systemd Unit文件，使服务可以自动加载
+sudo vim /etc/systemd/system/ndb_mgmd.service
 # 内容如下
 [Unit]
 Description=MySQL NDB Cluster Management Server 
