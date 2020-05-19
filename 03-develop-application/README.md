@@ -89,7 +89,7 @@ FLUSH PRIVILEGES;
 4. 建库建表导入数据
 ```
 create database movies;
-user movies;
+use movies;
 
 create table genomescores (movieId int,tagId int,relevance varchar(100))engine=ndbcluster;
 ```

@@ -108,7 +108,7 @@ Shell>sudo systemctl status ndb_mgmd
 5. 配置数据节点(192.168.57.111和192.168.57.110上都进行)
 ```
 # 安装依赖包
-sudo apt-get –f install && sudo apt install libclass-methodmaker-perl
+sudo apt-get -f install && sudo apt install libclass-methodmaker-perl
 # 安装数据节点包
 cd install
 sudo dpkg -i mysql-cluster-community-data-node_8.0.19-1ubuntu16.04_amd64.deb
@@ -168,8 +168,9 @@ status如下图所示
 
 ```
 # 进入包含MySQL Cluster组件的目录:
+# copy不可以就手敲
 cd install
-
+sudo apt update && sudo apt install libaio1 libmecab2
 # 然后安装解压在install目录的软件包中的一些MySQL Cluster 依赖包:
 sudo dpkg -i mysql-common_8.0.19-1ubuntu16.04_amd64.deb
 
