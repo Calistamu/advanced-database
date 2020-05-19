@@ -96,6 +96,7 @@ use movies;
 # genome-scores.csv
 create table genomescores (movieId int,tagId int,relevance varchar(100))engine=ndbcluster;
 
+#之后的导入语句与之相似，不再重复
 mysql> load data infile '/var/lib/mysql-files/genome-scores.csv'
     -> into table genomescores
     -> fields terminated by ',' optionally enclosed by '"' escaped by '"'
@@ -103,25 +104,56 @@ mysql> load data infile '/var/lib/mysql-files/genome-scores.csv'
     -> ignore 1 lines
     -> (movieId,tagId,relevance); 
 ```
-![](images/insert-1.png)
-
+![](images/insert-1.png)  
+导入tags.csv  
 ```
 # tags.csv
 create table tags(userId int,movieId int,tag varchar(40),timestamps long)engine=ndbcluster;
 ```
-
+![](images/insert-2.png)  
+导入movies.csv  
 ```
 # movies.csv
 create table movies (movieId int,title varchar(100),genres varchar(300))engine=ndbcluster;
-
+```
+![](images/insert-3.png)  
+导入users.csv  
+```
 # users.csv
 create table users(userId int,gender varchar(10),name varchar(20))engine=ndbcluster;
-
+```
+![](images/insert-4.png)  
+导入links.csv  
+```
+# links.csv
+create table links(movieId int,imdbId int,tmdbId int)engine=ndbcluster;
+```
+![](images/insert-5.png)    
+导入genome-tags.csv  
+```
+# genome-tags.csv
+create table genometags(tagId int,tag varchar(40))engine=ndbcluster;
+```
+![](images/insert-6.png)  
+导入ratings.csv  
+```
 # ratings.csv
 create table ratings(userId int,movieId int,rating double,timestamp long)engine=ndbcluster;
-# 
 ```
-### 四、前端搭建
+此'movies'数据库中的表结构如下图：  
+
+
+
+###  四、数据分析
+【tags.csv】和【genome-tags.csv】中的tag不一样，【tags.csv】中有重复值，【genome-tags.csv】中没有重复值，因此筛选【tags.csv】中的tag作为'风格'的标准。  
+* 如图【tags.csv】中有重复值  
+![](images/group-tags.png)  
+* 如图【genome-tags.csv】中没有重复值  
+![](images/group-genometags.png)
+使用Excel中的数据透视图对【tags.csv】中tag的重复值进行统计，再以合计结果进行降序排列，得到如下图结果，由于数据太多，我们选择前20项作为选择框的选项。   
+![](images/counted-tags.png)
+
+### 五、前端搭建
 ## 实验问题
 ### 1. 物理机连接虚拟机报错
 远程访问虚拟机数据时```grant all privileges on *.* to user@'%' identified by 'password';```一直报错。    
