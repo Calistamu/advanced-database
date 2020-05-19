@@ -80,21 +80,22 @@ FLUSH PRIVILEGES;
 ![](images/data-test.png)
 ### 三、虚拟机中导入数据
 * 为避免操作失误导致系统崩溃，快照一下
-1. 下载老师给的数据包，将文件另存为ANSI编码
-![](images/change-to-ANSI.png)  
+1. 下载老师给的数据包，文件都已经是UTF-8编码格式。 
 2. ssh文件传入虚拟机  
 3. 建库名为'movies'  
 ```create database movies；```
 ![](images/show-database.png)
 4. 建库建表导入数据
+* 将数据cp到/var/lib/mysql-files/内
 ```
 create database movies;
 use movies;
-
+```
+导入enome-scores.csv
+```
+# genome-scores.csv
 create table genomescores (movieId int,tagId int,relevance varchar(100))engine=ndbcluster;
-```
-将数据cp到/var/lib/mysql-files/内
-```
+
 mysql> load data infile '/var/lib/mysql-files/genome-scores.csv'
     -> into table genomescores
     -> fields terminated by ',' optionally enclosed by '"' escaped by '"'
@@ -102,7 +103,24 @@ mysql> load data infile '/var/lib/mysql-files/genome-scores.csv'
     -> ignore 1 lines
     -> (movieId,tagId,relevance); 
 ```
+![](images/insert-1.png)
 
+```
+# tags.csv
+create table tags(userId int,movieId int,tag varchar(40),timestamps long)engine=ndbcluster;
+```
+
+```
+# movies.csv
+create table movies (movieId int,title varchar(100),genres varchar(300))engine=ndbcluster;
+
+# users.csv
+create table users(userId int,gender varchar(10),name varchar(20))engine=ndbcluster;
+
+# ratings.csv
+create table ratings(userId int,movieId int,rating double,timestamp long)engine=ndbcluster;
+# 
+```
 ### 四、前端搭建
 ## 实验问题
 ### 1. 物理机连接虚拟机报错
