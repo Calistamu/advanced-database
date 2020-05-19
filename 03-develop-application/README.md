@@ -4,7 +4,7 @@
 - [] 1.	搜索任务：A：根据用户ID，搜索用户所看的电影名字和评分，按时间从新到旧排序，给出电影的前三个标签及关联度评分；B: 根据输入的关键词，查询电影名字里有关键词的电影。C：查询某一风格最受欢迎的20部电影（请给出你的最受欢迎的定义，风格数据处理较难，需要精心设计），D：根据性别推荐最受欢迎的电影20部电影。
 - [] 2.	界面规范： 界面上应该有录入用户ID, 检索关键词、风格等的文本框和不同任务的提交按钮，风格最好提供选择框。 搜索结果要在网页上或客户端图形UI 展示，超过一页的要有滚动条。
 - [] 3.	用户希望界面友好。
-- [] 4.	系统可以支持未来数据量的大幅增加。
+- [x] 4. 系统可以支持未来数据量的大幅增加。
 - [] 5.	各组尽可能地做查询速度的优化，并在最后提交的文档中包含测试结果。
 ## 实验环境
 python3.7.3+flask0.12.2+mysql cluster8.0.19(win10)的web数据库应用程序  
@@ -148,17 +148,22 @@ mysql> load data infile '/var/lib/mysql-files/genome-scores.csv'
 ![](images/wrong11.png)  
 再次插入数据，出现双键报错'ERROR 1022 (23000): Can't write; duplicate key in table 'genomescores''，更改创建表语句，不使用primary key。正确语句为：```create table genomescores (movieId int,tagId int,relevance varchar(100))engine=ndbcluster;```
 ![](images/wrong12.png)  
-最后出现了'table full'的问题。  
+最后出现了'table full'的问题，跳转到问题3。  
+### 3. 关于mysql-cluster导入数据时报错'table full'解决办法---实现扩容，达到作业要求【4系统可以支持未来数据量的大幅增加。】
 ![](images/wrong13.png)
 如下图更改/etc/mysql/my.cnf和/etc/my.cnf: 
 * tmp_table_size 控制内存临时表的最大值，超过限值后就往硬盘写，写的位置由变量tmpdir决定。
 * max_heap_table_size 用户可以创建的内存表(memory table)的大小.这个值用来计算内存表的最大行数值。 
 
-解决：[mysql 解决 ERROR 1114 (HY000): The table 'XXX' is full](https://www.cnblogs.com/wf-l5201314/p/11526452.html)
+解决参考：[mysql 解决 ERROR 1114 (HY000): The table 'XXX' is full](https://www.cnblogs.com/wf-l5201314/p/11526452.html)
 ![](images/wrong14.png)  
 看到内存确实更改。  
 ![](images/wrong15.png)  
-再次插入数据这个报错都还是有,现代告我们是mysql cluster，会不会数据管理上不一样，确实是的。```sudo vim /var/lib/mysql-cluster/config.ini```如下图修改config.ini并保存。
+再次插入数据这个报错都还是有。  
+分析：突然意识到我们是mysql cluster，会不会数据管理上不一样，确实是的。  
+解决：[参考](https://serverfault.com/questions/530015/ndb-cluster-table-is-full)  
+```ndb_mgm -e shutdown ```关闭ndb_mgm.  
+```sudo vim /var/lib/mysql-cluster/config.ini```如下图修改config.ini并保存。
 * DataMemory：设定用于存放数据和主键索引的内存段的大小。这个大小限制了能存放的数据的大小，因为ndb存储引擎需属于内存数据库引擎，需要将所有的数据（包括索引）都load到内存中。这个参数并不是一定需要设定的，但是默认值非常小（80M），只也就是说如果使用默认值，将只能存放很小的数据。参数设置需要带上单位，如512M，2G等。另外，DataMemory里面还会存放UNDO相关的信息，所以，事务的大小和事务并发量也决定了DataMemory的使用量，建议尽量使用小事务；
 
 * IndexMemory：设定用于存放索引（非主键）数据的内存段大小。和DataMemory类似，这个参数值的大小同样也会限制该节点能存放的数据的大小，因为索引的大小是随着数据量增长而增长的。参数设置也如DataMemory一样需要单位。IndexMemory默认大小为18M；
@@ -166,8 +171,10 @@ mysql> load data infile '/var/lib/mysql-files/genome-scores.csv'
 * 实际上，一个NDB节点能存放的数据量是会受到DataMemory和IndexMemory两个参数设置的约束，两者任何一个达到限制数量后，都无法再增加能存储的数据量。如果继续存入数据系统会报错“table is full”。
 
 ![](images/wrong16.png)
-使用```sudo ndb_mgmd --initial --reload --config-file=/var/lib/mysql-cluster/config.ini```让配置文件生效
+使用```sudo ndb_mgmd --initial --reload --config-file=/var/lib/mysql-cluster/config.ini```让配置文件生效，忽略warnings。
 * ```sudo ndb_mgmd -f /var/lib/mysql-cluster/config.ini --reload```一开始执行此命令，设置的config.ini一直没生效，因为少了--initial,后来想想确实应该initial，是要还原设置再重新配置。
+
+![](images/wrong17.png)
 ## 实验总结
 1. 关于修改了my.cnf不生效问题总结。  
 参考：[修改my.cnf配置不生效](https://www.kancloud.cn/thinkphp/mysql-faq/47452)  
