@@ -147,7 +147,7 @@ create table ratings(userId int,movieId int,rating double,timestamp long)engine=
 
 
 ###  四、数据分析
-【tags.csv】和【genome-tags.csv】中的tag不一样，【tags.csv】中有重复值，【genome-tags.csv】中没有重复值，因此筛选【tags.csv】中的tag作为'风格'的标准。  
+1. 【tags.csv】和【genome-tags.csv】中的tag不一样，【tags.csv】中有重复值，【genome-tags.csv】中没有重复值，因此筛选【tags.csv】中的tag作为'风格'的标准。  
 * 如图【tags.csv】中有重复值  
 ![](images/group-tags.png)  
 * 如图【genome-tags.csv】中没有重复值  
