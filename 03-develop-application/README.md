@@ -12,6 +12,7 @@ python3.7.3+flask0.12.2+mysql cluster8.0.19(win10)的web数据库应用程序
 ## 实验步骤
 ### 一. 在实验01-deploy-mysql的基础上配置mysql cluster，开启mysql cluster(配置时使用自启动)并确保一切正常。
 服务器虚拟机（也是一个数据节点）执行：  
+* 由于为了满足实验可拓展的要求，原有的虚拟机内存不够又拍了快照无法扩容，因此重新创建虚拟机。192.168.57.114(manager+data node)和192.168.57.115(data node)分别对应原有的192.168.57.111(manager+data node)和192.168.57.110(data node)。
 ```
 # 杀掉正在运行的服务
 sudo pkill -f ndb_mgmd
@@ -19,12 +20,6 @@ sudo pkill -f ndb_mgmd
 sudo netstat -plntu
 # 启动管理器
 sudo ndb_mgmd -f /var/lib/mysql-cluster/config.ini
-
-# 最后，启动服务：
-Shell> sudo systemctl start ndb_mgmd
-# 可以通过如下语句验证NDB Cluster Management service服务正在执行：
-Shell>sudo systemctl status ndb_mgmd
-
 
 # 最后，启动数据节点服务：
 sudo systemctl start ndbd
@@ -136,6 +131,7 @@ create table genometags(tagId int,tag varchar(40))engine=ndbcluster;
 ```
 ![](images/insert-6.png)  
 导入ratings.csv  
+* 其余表中数据全部导入。由于此表数据太多有98万，无论对于导入数据还是数据查询都太费时间，因此没有导入完全
 ```
 # ratings.csv
 create table ratings(userId int,movieId int,rating double,timestamp long)engine=ndbcluster;
@@ -144,18 +140,37 @@ create table ratings(userId int,movieId int,rating double,timestamp long)engine=
 此'movies'数据库中的表结构如下图：  
 ![](images/tables-info.png)
 
-
-
-###  四、数据分析
-1. 【tags.csv】和【genome-tags.csv】中的tag不一样，【tags.csv】中有重复值，【genome-tags.csv】中没有重复值，因此筛选【tags.csv】中的tag作为'风格'的标准。  
+###  四、数据分析+需求分析
+1. 各数据表之间的关系分析
+2. 对于各任务的实现分析
+1. 对于任务C的实现：【tags.csv】和【genome-tags.csv】中的tag不一样，【tags.csv】中有重复值，【genome-tags.csv】中没有重复值，因此筛选【tags.csv】中的tag作为'风格'的标准。  
 * 如图【tags.csv】中有重复值  
 ![](images/group-tags.png)  
 * 如图【genome-tags.csv】中没有重复值  
 ![](images/group-genometags.png)
 使用Excel中的数据透视图对【tags.csv】中tag的重复值进行统计，再以合计结果进行降序排列，得到如下图结果，由于数据太多，我们选择前20项作为选择框的选项。   
 ![](images/counted-tags.png)
-
-### 五、前端搭建
+3. 对于flask界面功能分析
+### 五、select语句编写及测试
+#### 任务A
+```
+mysql> select title,rating,relevance,tagId
+    -> from ratings,genomescores,movies
+    -> where ratings.userId=1
+    -> and genomescores.movieId=movies.movieId=ratings.movieId
+    -> order by ratings.timestamp
+    -> limit 3;
+```
+#### 任务B
+```
+mysql> select movieId,title,genres
+    -> from movies
+    -> where movies.title like "%Story%";
+```
+![](images/select-b.png)
+#### 任务C
+#### 任务D
+### 六、前端搭建
 ## 实验问题
 ### 1. 物理机连接虚拟机报错
 远程访问虚拟机数据时```grant all privileges on *.* to user@'%' identified by 'password';```一直报错。    
