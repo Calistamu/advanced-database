@@ -149,18 +149,21 @@ ratings导入数据数目：
 
 ###  四、数据分析+需求分析
 1. 各数据表之间的关系分析
-
+![](images/design-1.jpg)
 2. 对于各任务的实现分析
-
-
-3. 对于flask界面功能分析
-1. 对于任务C的实现：【tags.csv】和【genome-tags.csv】中的tag不一样，【tags.csv】中有重复值，【genome-tags.csv】中没有重复值，因此筛选【tags.csv】中的tag作为'风格'的标准。  
-* 如图【tags.csv】中有重复值  
+![](images/design-2.jpg)
+* 对于任务C的实现：【tags.csv】和【genome-tags.csv】中的tag不一样，【tags.csv】中有重复值，【genome-tags.csv】中没有重复值，因此筛选【tags.csv】中的tag作为'风格'的标准。  
+如图【tags.csv】中有重复值  
 ![](images/group-tags.png)  
-* 如图【genome-tags.csv】中没有重复值  
+如图【genome-tags.csv】中没有重复值  
 ![](images/group-genometags.png)
 使用Excel中的数据透视图对【tags.csv】中tag的重复值进行统计，再以合计结果进行降序排列，得到如下图结果，由于数据太多，我们选择前20项作为选择框的选项。   
 ![](images/counted-tags.png)
+>任务C的风格筛选top20存于：data/tag-top20.txt
+>对原有文件【tags.csv】的数据分析结果：data/analyzed-tags.csv
+3. 对于flask界面功能分析
+![](images/design-3.jpg)
+
 ### 五、select语句编写及测试
 #### 任务A
 ```
@@ -204,6 +207,7 @@ limit 20;
 ```
 ![](images/select-d.png)
 ### 六、前端搭建
+
 ## 实验问题
 ### 1. 物理机连接虚拟机报错
 远程访问虚拟机数据时```grant all privileges on *.* to user@'%' identified by 'password';```一直报错。    
