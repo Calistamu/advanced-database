@@ -101,9 +101,11 @@ mysql> load data infile '/var/lib/mysql-files/genome-scores.csv'
 ```
 ![](images/insert-1.png)  
 导入tags.csv  
+* 由于数据太多，没有导入完全,具体数目如下图所示。  
+![](images/tags-count.png)
 ```
 # tags.csv
-create table tags(userId int,movieId int,tag varchar(40),timestamps long)engine=ndbcluster;
+create table tags(userId int,movieId int,tag varchar(40),timestamp long)engine=ndbcluster;
 ```
 ![](images/insert-2.png)  
 导入movies.csv  
@@ -125,24 +127,33 @@ create table links(movieId int,imdbId int,tmdbId int)engine=ndbcluster;
 ```
 ![](images/insert-5.png)    
 导入genome-tags.csv  
+* 由于数据太多，没有导入完全,具体数目如下图所示。  
+![](images/genomescores-count.png)
 ```
 # genome-tags.csv
 create table genometags(tagId int,tag varchar(40))engine=ndbcluster;
 ```
 ![](images/insert-6.png)  
 导入ratings.csv  
-* 其余表中数据全部导入。由于此表数据太多有98万，无论对于导入数据还是数据查询都太费时间，因此没有导入完全
+* 由于此表数据太多，无论对于导入数据还是数据查询都太费时间，因此没有导入完全.ratings导入数据数目：  
+![](images/rating-count.png)
 ```
 # ratings.csv
 create table ratings(userId int,movieId int,rating double,timestamp long)engine=ndbcluster;
 ```
 ![](images/insert-7.png)  
+ratings导入数据数目：  
+![](images/rating-count.png)
 此'movies'数据库中的表结构如下图：  
 ![](images/tables-info.png)
 
 ###  四、数据分析+需求分析
 1. 各数据表之间的关系分析
+
 2. 对于各任务的实现分析
+
+
+3. 对于flask界面功能分析
 1. 对于任务C的实现：【tags.csv】和【genome-tags.csv】中的tag不一样，【tags.csv】中有重复值，【genome-tags.csv】中没有重复值，因此筛选【tags.csv】中的tag作为'风格'的标准。  
 * 如图【tags.csv】中有重复值  
 ![](images/group-tags.png)  
@@ -150,26 +161,48 @@ create table ratings(userId int,movieId int,rating double,timestamp long)engine=
 ![](images/group-genometags.png)
 使用Excel中的数据透视图对【tags.csv】中tag的重复值进行统计，再以合计结果进行降序排列，得到如下图结果，由于数据太多，我们选择前20项作为选择框的选项。   
 ![](images/counted-tags.png)
-3. 对于flask界面功能分析
 ### 五、select语句编写及测试
 #### 任务A
 ```
-mysql> select title,rating,relevance,tagId
-    -> from ratings,genomescores,movies
-    -> where ratings.userId=1
-    -> and genomescores.movieId=movies.movieId=ratings.movieId
-    -> order by ratings.timestamp
-    -> limit 3;
+select movies.title,ratings.rating,genomescores.tagId,genomescores.relevance
+from ratings,genomescores,movies
+where ratings.userId=4
+and genomescores.movieId=movies.movieId
+and movies.movieId=ratings.movieId
+order by ratings.timestamp desc
+limit 3;
 ```
+![](images/select-a.png)
 #### 任务B
 ```
-mysql> select movieId,title,genres
-    -> from movies
-    -> where movies.title like "%Story%";
+select movieId,title,genres
+from movies
+where movies.title like "%Story%";
 ```
 ![](images/select-b.png)
 #### 任务C
+```
+select distinct movies.title 
+from tags,ratings,movies
+where tags.tag="epic"
+and tags.movieId=ratings.movieId
+and ratings.movieId=movies.movieId
+order by ratings.rating
+limit 20;
+```
+![](images/select-c.png)
+* 这里只有九部是因为导入数据有限
 #### 任务D
+```
+select title
+from users,ratings,movies
+where users.gender="Man"
+and users.userId=ratings.userId
+and movies.movieId=ratings.movieId
+order by ratings.rating
+limit 20;
+```
+![](images/select-d.png)
 ### 六、前端搭建
 ## 实验问题
 ### 1. 物理机连接虚拟机报错
@@ -251,6 +284,13 @@ mysql> select movieId,title,genres
 ![](images/expand-vdi.png)  
 .vdi扩容后的前后对比  
 ![](images/expand-vs.jpg)
+### 6. 测试select语句无法使用'group by'
+具体报错：  
+![](images/wrong21.png)  
+分析：由于使用的是mysql cluster 8.0,语法更加严格了。  
+解决：[解决参考](https://github.com/Piwigo/Piwigo/issues/376)     
+修改/etc/mysql/my.cnf文件   
+![](images/wrong20.png)  
 ## 实验总结
 1. 关于修改了my.cnf不生效问题总结。  
 参考：[修改my.cnf配置不生效](https://www.kancloud.cn/thinkphp/mysql-faq/47452)  
