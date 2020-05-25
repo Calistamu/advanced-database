@@ -295,6 +295,9 @@ limit 20;
 解决：[解决参考](https://github.com/Piwigo/Piwigo/issues/376)     
 修改/etc/mysql/my.cnf文件   
 ![](images/wrong20.png)  
+### 7.flask测试使用查询语句时报错
+![](images/wrong22.png)  
+[解决参考](https://stackoverflow.com/questions/11695801/python-valueerror-unsupported-format-character-0x27-at-index-1),当sql语句中使用到Like时，flask调用使用like '%%%s%%'
 ## 实验总结
 1. 关于修改了my.cnf不生效问题总结。  
 参考：[修改my.cnf配置不生效](https://www.kancloud.cn/thinkphp/mysql-faq/47452)  
