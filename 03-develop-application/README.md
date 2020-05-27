@@ -149,9 +149,9 @@ ratings导入数据数目：
 
 ###  四、数据分析+需求分析
 1. 各数据表之间的关系分析
-![](images/design-1.jpg)
+![](images/design-1.png)
 2. 对于各任务的实现分析
-![](images/design-2.jpg)
+![](images/design-2.png)
 * 对于任务C的实现：【tags.csv】和【genome-tags.csv】中的tag不一样，【tags.csv】中有重复值，【genome-tags.csv】中没有重复值，因此筛选【tags.csv】中的tag作为'风格'的标准。  
 如图【tags.csv】中有重复值  
 ![](images/group-tags.png)  
@@ -162,7 +162,7 @@ ratings导入数据数目：
 >任务C的风格筛选top20存于：data/tag-top20.txt
 >对原有文件【tags.csv】的数据分析结果：data/analyzed-tags.csv
 3. 对于flask界面功能分析
-![](images/design-3.jpg)
+![](images/design-3.png)
 
 ### 五、select语句编写及测试
 #### 任务A
