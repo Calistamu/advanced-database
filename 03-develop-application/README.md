@@ -1,8 +1,14 @@
 # 分组综合实验作业
 ##  实验要求
 开发一个基于客户服务器或WEB的数据库应用，这个应用是查询一个关于电影数据库的数据，数据部分信息经过了脱密处理，数据及相关数据文档由教师指定。开发的基本功能需求如下：
-- [] 1.	搜索任务：A：根据用户ID，搜索用户所看的电影名字和评分，按时间从新到旧排序，给出电影的前三个标签及关联度评分；B: 根据输入的关键词，查询电影名字里有关键词的电影。C：查询某一风格最受欢迎的20部电影（请给出你的最受欢迎的定义，风格数据处理较难，需要精心设计），D：根据性别推荐最受欢迎的电影20部电影。
-- [] 2.	界面规范： 界面上应该有录入用户ID, 检索关键词、风格等的文本框和不同任务的提交按钮，风格最好提供选择框。 搜索结果要在网页上或客户端图形UI 展示，超过一页的要有滚动条。
+- [x] 1. 搜索任务：  
+A：根据用户ID，搜索用户所看的电影名字和评分，按时间从新到旧排序，给出电影的前三个标签及关联度评分。  
+B: 根据输入的关键词，查询电影名字里有关键词的电影。  
+C：查询某一风格最受欢迎的20部电影（请给出你的最受欢迎的定义，风格数据处理较难，需要精心设计）。  
+D：根据性别推荐最受欢迎的电影20部电影。
+- [x] 2. 界面规范：  
+界面上应该有录入用户ID, 检索关键词、风格等的文本框和不同任务的提交按钮，风格最好提供选择框。  
+搜索结果要在网页上或客户端图形UI展示，超过一页的要有滚动条。
 - [] 3.	用户希望界面友好。
 - [x] 4. 系统可以支持未来数据量的大幅增加。
 - [x] 5. 各组尽可能地做查询速度的优化，并在最后提交的文档中包含测试结果。
@@ -236,6 +242,20 @@ limit 20;
 可以看到D任务查询时间：2.33sec  
 ![](images/select-d.png)
 ### 六、前端搭建
+1. 前端flask功能完善及调用数据测试
+>code/manage.py
+
+截图如下：  
+![](images/result-a.png)  
+![](images/result-b.png)
+![](images/result-c.png)  
+![](images/result-d.png)   
+演示流程：  
+
+>videos/result-withoutbeauty.wmv是清晰的录制视频已转成gif如下所示：
+
+![](videos/result-withoutbeauty.gif)   
+### 七、前端美化
 
 ## 实验问题
 ### 1. 物理机连接虚拟机报错
@@ -324,9 +344,33 @@ limit 20;
 解决：[解决参考](https://github.com/Piwigo/Piwigo/issues/376)     
 修改/etc/mysql/my.cnf文件   
 ![](images/wrong20.png)  
-### 7.flask测试使用查询语句时报错
+### 7. flask测试使用查询语句时报错
 ![](images/wrong22.png)  
 [解决参考](https://stackoverflow.com/questions/11695801/python-valueerror-unsupported-format-character-0x27-at-index-1),当sql语句中使用到Like时，flask调用使用like '%%%s%%'
+### 8. 进行flask功能完善和数据调用时出现报错：'pymysql.err.InternalError: (3, "Error writing file '/tmp/MYfd=2877' (OS errno 28 - No space left on device)")'
+报错信息如下：  
+![](images/wrong24.png)  
+这个错误导致提交以后一直无法显示数据'Pending POST'的问题  
+![](images/wrong23.png)  
+解决及分析：在app.run()中增加'threaded=True'，但是还是错，最后发现关键问题在于任务D的查询语句写错了。本来应该是
+```
+select title
+from users,ratings,movies
+where users.gender='%s'
+and users.userId=ratings.userId
+and movies.movieId=ratings.movieId
+order by ratings.rating
+limit 20;'''
+```
+非常愚蠢地写成了：
+```
+select title
+from users,ratings,movies
+where users.gender='%s'
+and users.userId=ratings.userId=movies.movieId=ratings.movieId
+order by ratings.rating
+limit 20;'''
+```
 ## 实验总结
 1. 关于修改了my.cnf不生效问题总结。  
 参考：[修改my.cnf配置不生效](https://www.kancloud.cn/thinkphp/mysql-faq/47452)  
@@ -362,4 +406,6 @@ mysql是命令行客户端程序。
 [csv文件导入Mysql](https://blog.csdn.net/quiet_girl/article/details/71436108)  
 [MySQL 使用 LOAD DATA 导入 csv 文件](https://blog.csdn.net/liqfyiyi/article/details/78831322)   
 [MySQL Cluster配置详细介绍（config.ini）](https://www.linuxidc.com/Linux/2010-06/26640.htm)  
-[17.3.3 MySQL Cluster Configuration Files](https://docs.oracle.com/cd/E17952_01/mysql-5.0-en/mysql-cluster-config-file.html)
+[17.3.3 MySQL Cluster Configuration Files](https://docs.oracle.com/cd/E17952_01/mysql-5.0-en/mysql-cluster-config-file.html)  
+[video-to-gif](https://ezgif.com/video-to-gif)  
+[wmv-to-gif](https://cloudconvert.com/wmv-to-gif)  
