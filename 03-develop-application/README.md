@@ -166,9 +166,10 @@ ratings导入数据数目：
 
 ### 五、select语句编写、测试及优化
 * select语句优化参考：[最全的SQL优化策略送给你](https://zhuanlan.zhihu.com/p/47155782)
-* 硬件设施优化（部分关键属性说明）：  
+* 硬件设施优化参考：  
 [17.3.3.1 MySQL Cluster Configuration: Basic Example](https://docs.oracle.com/cd/E17952_01/mysql-5.0-en/mysql-cluster-config-example.html#mysql-cluster-config-ini-sections)-Global configuration options are discussed later in this section   
 [17.3.3.5 Defining MySQL Cluster Data Nodes](https://docs.oracle.com/cd/E17952_01/mysql-5.0-en/mysql-cluster-ndbd-definition.html)-The【ndbd】and 【ndbd default】 sections are used to configure the behavior of the cluster's data nodes
+* 部分关键设置说明：
 * Data memory, index memory---they usually need to be updated to reflect actual usage by the cluster  
 Dats memory: This parameter defines the amount of space (in bytes) available for storing database records. The entire amount specified by this value is allocated in memory, so it is extremely important that the machine has sufficient physical memory to accommodate it.The memory allocated by DataMemory is used to store both the actual records and indexes.  
 index memory:This parameter controls the amount of storage used for hash indexes in MySQL Cluster. Hash indexes are always used for primary key indexes, unique indexes, and unique constraints. Note that when defining a primary key and a unique index, two indexes will be created, one of which is a hash index used for all tuple accesses as well as lock handling. It is also used to enforce unique constraints.    
@@ -360,4 +361,5 @@ mysql是命令行客户端程序。
 [LOAD DATA Statement](https://dev.mysql.com/doc/refman/5.6/en/load-data.html)  
 [csv文件导入Mysql](https://blog.csdn.net/quiet_girl/article/details/71436108)  
 [MySQL 使用 LOAD DATA 导入 csv 文件](https://blog.csdn.net/liqfyiyi/article/details/78831322)   
-[MySQL Cluster配置详细介绍（config.ini）](https://www.linuxidc.com/Linux/2010-06/26640.htm)
+[MySQL Cluster配置详细介绍（config.ini）](https://www.linuxidc.com/Linux/2010-06/26640.htm)  
+[17.3.3 MySQL Cluster Configuration Files](https://docs.oracle.com/cd/E17952_01/mysql-5.0-en/mysql-cluster-config-file.html)
