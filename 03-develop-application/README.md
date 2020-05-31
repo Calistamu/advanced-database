@@ -243,7 +243,7 @@ limit 20;
 ![](images/select-d.png)
 ### 六、前端搭建
 1. 前端flask功能完善及调用数据测试
->code/manage.py
+>code/manage-withoutbeauty.py是没有美化的页面
 
 截图如下：  
 ![](images/result-a.png)  
@@ -256,7 +256,7 @@ limit 20;
 
 ![](videos/result-withoutbeauty.gif)   
 ### 七、前端美化
-
+```pip install bootstrap-flask```
 ## 实验问题
 ### 1. 物理机连接虚拟机报错
 远程访问虚拟机数据时```grant all privileges on *.* to user@'%' identified by 'password';```一直报错。    
@@ -409,3 +409,5 @@ mysql是命令行客户端程序。
 [17.3.3 MySQL Cluster Configuration Files](https://docs.oracle.com/cd/E17952_01/mysql-5.0-en/mysql-cluster-config-file.html)  
 [video-to-gif](https://ezgif.com/video-to-gif)  
 [wmv-to-gif](https://cloudconvert.com/wmv-to-gif)  
+[Bootstrap-Introduction](https://getbootstrap.com/docs/4.3/getting-started/introduction/)  
+[BootstrapCDN](https://www.bootstrapcdn.com/)  
