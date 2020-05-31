@@ -5,7 +5,7 @@
 - [] 2.	界面规范： 界面上应该有录入用户ID, 检索关键词、风格等的文本框和不同任务的提交按钮，风格最好提供选择框。 搜索结果要在网页上或客户端图形UI 展示，超过一页的要有滚动条。
 - [] 3.	用户希望界面友好。
 - [x] 4. 系统可以支持未来数据量的大幅增加。
-- [] 5.	各组尽可能地做查询速度的优化，并在最后提交的文档中包含测试结果。
+- [x] 5. 各组尽可能地做查询速度的优化，并在最后提交的文档中包含测试结果。
 ## 实验环境
 python3.7.3+flask0.12.2+mysql cluster8.0.19(win10)的web数据库应用程序  
 ![](images/version.png)
@@ -164,7 +164,29 @@ ratings导入数据数目：
 3. 对于flask界面功能分析
 ![](images/design-3.png)
 
-### 五、select语句编写及测试
+### 五、select语句编写、测试及优化
+* select语句优化参考：[最全的SQL优化策略送给你](https://zhuanlan.zhihu.com/p/47155782)
+* 硬件设施优化（部分关键属性说明）：  
+[17.3.3.1 MySQL Cluster Configuration: Basic Example](https://docs.oracle.com/cd/E17952_01/mysql-5.0-en/mysql-cluster-config-example.html#mysql-cluster-config-ini-sections)-Global configuration options are discussed later in this section   
+[17.3.3.5 Defining MySQL Cluster Data Nodes](https://docs.oracle.com/cd/E17952_01/mysql-5.0-en/mysql-cluster-ndbd-definition.html)-The【ndbd】and 【ndbd default】 sections are used to configure the behavior of the cluster's data nodes
+* Data memory, index memory---they usually need to be updated to reflect actual usage by the cluster  
+Dats memory: This parameter defines the amount of space (in bytes) available for storing database records. The entire amount specified by this value is allocated in memory, so it is extremely important that the machine has sufficient physical memory to accommodate it.The memory allocated by DataMemory is used to store both the actual records and indexes.  
+index memory:This parameter controls the amount of storage used for hash indexes in MySQL Cluster. Hash indexes are always used for primary key indexes, unique indexes, and unique constraints. Note that when defining a primary key and a unique index, two indexes will be created, one of which is a hash index used for all tuple accesses as well as lock handling. It is also used to enforce unique constraints.    
+总结：扩大存储
+* Transaction parameters---they affect the number of parallel transactions and the sizes of transactions that can be handled by the system.  
+MaxNoOfConcurrentTransactions sets the number of parallel transactions possible in a node.   
+MaxNoOfConcurrentOperations sets the number of records that can be in update phase or locked simultaneously.   
+总结：提高并行处理计算速度
+* Transaction temporary storage---The next set of [ndbd] parameters is used to determine temporary storage when executing a statement that is part of a Cluster transaction. All records are released when the statement is completed and the cluster is waiting for the commit or rollback.
+The default values for these parameters are adequate for most situations. However, users with a need to support transactions involving large numbers of rows or operations may need to increase these values to enable better parallelism in the system, whereas users whose applications require relatively small transactions can decrease the values to save memory.   
+MaxNoOfConcurrentIndexOperations:For queries using a unique hash index, another temporary set of operation records is used during a query's execution phase. This parameter sets the size of that pool of records. Thus, this record is allocated only while executing a part of a query. As soon as this part has been executed, the record is released.  
+MaxNoOfFiredTriggers：The default value of MaxNoOfFiredTriggers is 4000, which is sufficient for most situations. In some cases it can even be decreased if the DBA feels certain the need for parallelism in the cluster is not high.   
+总结：通过优化临时存储，来实现更好的并行性。
+* Metadata objects.  The next set of [ndbd] parameters defines pool sizes for metadata objects, used to define the maximum number of attributes, tables, indexes, and trigger objects used by indexes, events, and replication between clusters.   
+总结：提高索引、事件和集群间复制所使用的属性、表、索引和触发器对象的单位处理最大数量，从而提速。  
+```sudo vim /var/lib/mysql-cluster/config.ini```在配置文件中如下更改：  
+![](images/wrong16.png)
+
 #### 任务A
 ```
 select movies.title,ratings.rating,genomescores.tagId,genomescores.relevance
@@ -175,15 +197,19 @@ and movies.movieId=ratings.movieId
 order by ratings.timestamp desc
 limit 3;
 ```
+可以看到A任务查询时间：1.34sec  
 ![](images/select-a.png)
 #### 任务B
+* 优化：参考[MySQL带LIKE关键字的查询](https://blog.csdn.net/nangeali/article/details/74858171),like "%Story%"是最佳写法
 ```
 select movieId,title,genres
 from movies
 where movies.title like "%Story%";
 ```
+可以看到B任务查询时间：0.17sec   
 ![](images/select-b.png)
 #### 任务C
+* 优化改进：不用group by用distinct
 ```
 select distinct movies.title 
 from tags,ratings,movies
@@ -193,6 +219,7 @@ and ratings.movieId=movies.movieId
 order by ratings.rating
 limit 20;
 ```
+可以看到C任务查询时间：0.92sec  
 ![](images/select-c.png)
 * 这里只有九部是因为导入数据有限
 #### 任务D
@@ -205,6 +232,7 @@ and movies.movieId=ratings.movieId
 order by ratings.rating
 limit 20;
 ```
+可以看到D任务查询时间：2.33sec  
 ![](images/select-d.png)
 ### 六、前端搭建
 
