@@ -9,7 +9,7 @@ D：根据性别推荐最受欢迎的电影20部电影。
 - [x] 2. 界面规范：  
 界面上应该有录入用户ID, 检索关键词、风格等的文本框和不同任务的提交按钮，风格最好提供选择框。  
 搜索结果要在网页上或客户端图形UI展示，超过一页的要有滚动条。
-- [] 3.	用户希望界面友好。
+- [x] 3.	用户希望界面友好。
 - [x] 4. 系统可以支持未来数据量的大幅增加。
 - [x] 5. 各组尽可能地做查询速度的优化，并在最后提交的文档中包含测试结果。
 ## 实验环境
@@ -245,7 +245,9 @@ limit 20;
 1. 前端flask功能完善及调用数据测试
 >code/manage-withoutbeauty.py是没有美化的页面
 
-截图如下：  
+>code/templates/indexa.html是任务A没有美化的基本页面(indexb.html-任务B,indexc.html-任务C,indexd.html-任务D)
+
+演示截图如下：  
 ![](images/result-a.png)  
 ![](images/result-b.png)
 ![](images/result-c.png)  
@@ -256,7 +258,33 @@ limit 20;
 
 ![](videos/result-withoutbeauty.gif)   
 ### 七、前端美化
-```pip install bootstrap-flask```
+>code/manage.py是美化后的页面   
+
+>code/static是美化中要用到的模板
+
+>code/templates/index.html是美化后的html
+
+安装Bootstrap:```pip install bootstrap-flask```
+* 参考[Bootstrap-Introduction](https://getbootstrap.com/docs/4.3/getting-started/introduction/)+[BootstrapCDN](https://www.bootstrapcdn.com/)  
+
+演示截图如下:    
+首页:   
+![](images/home.png)  
+任务A:  
+![](images/taska.png)  
+任务B:  
+![](images/taskb.png)    
+任务C:  
+![](images/taskc.png)    
+任务D:  
+![](images/taskd.png)   
+版权：  
+![](images/copyright.png)  
+
+>video/result.wmv是清晰的美化后的演示视频,已转成gif如下所示:
+
+![](videos/result.gif)
+
 ## 实验问题
 ### 1. 物理机连接虚拟机报错
 远程访问虚拟机数据时```grant all privileges on *.* to user@'%' identified by 'password';```一直报错。    
@@ -270,7 +298,7 @@ limit 20;
 ![](images/wrong2.png) 
 尝试用ndb_import向ndb中导入.csv的方式报错，此方法不可。于是采用向mysql导入.csv的方式。 
 ![](images/wrong4.png)
-插入数据error1064报错，如下图。  
+插入数据error1064报错，如下图。  videos/result.gif
 ![](images/wrong3.png)  
 问题分析：多次尝试，参考[ERROR 1064 (42000): You have an error in your SQL syntax](https://blog.csdn.net/w1346561235/article/details/74502807)发现并不是语法的错误。
 解决：参考[MySQL load data infile ERROR 1064](https://dba.stackexchange.com/questions/249637/mysql-load-data-infile-error-1064)，对'/etc/my.cnf'进行修改后保存,使用```service mysql restart```重启Mysql。修改后的/etc/my.cnf如下图所示：
