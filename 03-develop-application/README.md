@@ -15,6 +15,21 @@ D：根据性别推荐最受欢迎的电影20部电影。
 ## 实验环境
 python3.7.3+flask0.12.2+mysql cluster8.0.19(win10)的web数据库应用程序  
 ![](images/version.png)
+* 为什么选择mysql cluster?  
+1. mysql cluster vs mongodb:  
+参考[Differences Between MySQL vs MongoDB](https://www.educba.com/mysql-vs-mongodb/)。  
+mysql是关系型数据库，Mongodb是Nosql数据库，mysql使用sql查询语句，Mongodb的存储文件是类json文件，查询较慢。  
+2. Mysql cluster vs Hbase:  
+参考[System Properties Comparison HBase vs. MySQL](https://db-engines.com/en/system/HBase%3BMySQL).  
+mysql cluster支持的编程语言更多，支持外键关联（我们这一次的表格关系复杂，可能会用到），Mysql是关系型数据库。HBase是宽列存储数据库，更适合数据分析和数据比对，没有实时数据访问。Hbase可以在线扩展(添加/删除)region server，来达到mysql cluster需要配置重启服务来开启和关闭数据节点的效果，但本次实验我们并不需要很多的数据节点。
+3. Mysql cluster vs Mysql Mycat:  
+参考[MyCAT](https://gitee.com/MycatOne/Mycat-Server)。
+二者不是一个层次的东西。mysql cluster是mysql使用NDB存储来实现的数据库集群,年代较为久远。mycat是数据库的中间件，主要进行分库分表处理，对数据进行半自动化分片（mysql cluster是自动分片），对每个表的分片策略进行配置和干涉。同时，Mycat是一个开源产品，功能比较强大，更支持开源产品和个性化定制。Mycat技术较为新颖，可扩展度很高，是一个面向企业应用开发的大数据集群。
+4. 总之：  
+我们的需求是：使用mysql cluster来存储数据以及快速查询得到结果反馈给前端。  
+在此需求的基础上：mysql cluster 更快使用更简单，发展更成熟。Mysql cluster是关系型数据库，且支持外键根据需求分析。本次实验各表关系复杂，多个属性相关联，我们需要多表联合查询得到结果。并且我们学过mysql，Mysql cluster的操作与mysql相似。除此之外，我们还可以在第一次实验的基础上调用数据。  
+因此，需求刚好，技术可行，mysql cluster是最佳选择。
+
 ## 实验步骤
 ### 一. 在实验01-deploy-mysql的基础上配置mysql cluster，开启mysql cluster(配置时使用自启动)并确保一切正常。
 服务器虚拟机（也是一个数据节点）执行：  
