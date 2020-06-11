@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Movies Select</title>
+</head>
+<body>
+  <div align="center">
+  <h2>Task C</h2>
+  <p>查询某一风格最受欢迎的20部电影</p>
+      <form method="POST">
+          <select name="tag" id="tag">
+          <option value="sci-fi">sci-fi</option>
+          <option value="action">action</option>
+          <option value="atmospheric">atmospheric</option>
+          <option value="comedy">comedy</option>
+          <option value="Funny">Funny</option>
+          <option value="surreal">surreal</option>
+          <option value="based on a book">based on a book</option>
+          <option value="twist ending">twist ending</option>
+          <option value="romance">romance</option>
+          <option value="visually appealing">visually appealing</option>
+          <option value="dystopia">dystopia</option>
+          <option value="fantasy">fantasy</option>
+          <option value="dark comedy">dark comedy</option>
+          <option value="classic">classic</option>
+          <option value="quirky">quirky</option>
+          <option value="woman director">woman director</option>
+          <option value="Nudity (Topless)">Nudity (Topless)</option>
+          <option value="stylized">stylized</option>
+          <option value="thought-provoking">thought-provoking</option>
+          <option value="psychology">psychology</option>         
+          </select>
+          <input type="submit" value="select">
+          <input type="reset" value="reset">
+      </form>
+   
+  </div>
+  <div class="taskc-info">
+    {% for r3 in rs3 %}
+    <p>title</p>
+     <p> 【{{r3[0]}}】</p><br>
+    <hr>
+    {%   endfor
+    %}
+    </div>
+  </body>
+  </html>

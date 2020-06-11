@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Movies Select</title>
+</head>
+<body>
+  <div align="center">
+  <h2>Task A</h2>
+  <p>根据用户ID，搜索用户所看的电影名字和评分，按时间从新到旧排序，给出电影的前三个标签及关联度评分</p>
+      <form method="POST">
+          <input type="text" name="userid" >
+          <input type="submit" value="select">
+          <input type="reset" value="reset">
+      </form>
+   
+  </div>
+  <div class="taska-info">
+    {% for r in rs %}
+    <p>title|rating|tagid|relevance</p>
+     <p> 【{{r[0]}}|{{r[1]}}|{{r[2]}}|{{r[3]}}】</p><br>
+    <hr>
+    {%   endfor
+    %}
+  </div>
+  </body>
+  </html>

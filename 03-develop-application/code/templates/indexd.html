@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Movies Select</title>
+</head>
+<body>
+  <div align="center">
+  <h2>Task D</h2>
+  <p>根据性别推荐最受欢迎的电影20部电影</p>
+      <form method="POST">
+        <select name="gender" id="gender">
+          <option value="Female">Female</option>
+          <option value="Man">Man</option>        
+      </select>
+          <input type="submit" value="select">
+          <input type="reset" value="reset">
+      </form>
+   
+  </div>
+  <div class="taskd-info">
+    {% for r4 in rs4 %}
+    <p>title</p>
+     <p> 【{{r4[0]}}】</p><br>
+    <hr>
+    {%   endfor
+    %}
+    </div>
+  </body>
+  </html>
