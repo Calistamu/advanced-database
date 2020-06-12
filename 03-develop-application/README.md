@@ -9,7 +9,7 @@ D：根据性别推荐最受欢迎的电影20部电影。
 - [x] 2. 界面规范：  
 界面上应该有录入用户ID, 检索关键词、风格等的文本框和不同任务的提交按钮，风格最好提供选择框。  
 搜索结果要在网页上或客户端图形UI展示，超过一页的要有滚动条。
-- [x] 3.	用户希望界面友好。
+- [x] 3. 用户希望界面友好。
 - [x] 4. 系统可以支持未来数据量的大幅增加。
 - [x] 5. 各组尽可能地做查询速度的优化，并在最后提交的文档中包含测试结果。
 ## 实验环境
@@ -70,8 +70,9 @@ sudo systemctl status ndbd
 >数据测试代码文件：code/test.py
 1. virtualbox中进行如下设置：  
 ![](images/virtual-set.png)
-2. 运行python依然得到报错信息：'Host '192.168.57.1' is not allowed to connect to this MySQL server'.  
-解决：参考[Host 'xxx.xx.xxx.xxx' is not allowed to connect to this MySQL server](https://stackoverflow.com/questions/1559955/host-xxx-xx-xxx-xxx-is-not-allowed-to-connect-to-this-mysql-server)对mysql cluster进行授权  
+2. 对Mysql数据库进行授权   
+运行test.py得到报错信息：'Host '192.168.57.1' is not allowed to connect to this MySQL server'.  
+解决：参考[Host 'xxx.xx.xxx.xxx' is not allowed to connect to this MySQL server](https://stackoverflow.com/questions/1559955/host-xxx-xx-xxx-xxx-is-not-allowed-to-connect-to-this-mysql-server)对mysql cluster进行授权 
 ```
 # 在虚拟机中操作
 mysql -u root -p
@@ -305,7 +306,6 @@ limit 20;
 远程访问虚拟机数据时```grant all privileges on *.* to user@'%' identified by 'password';```一直报错。    
 ![](images/wrong1.png)  
 解决：因为没有create该用户，先create再授权。 而且一开始没有好好理解比如问题语句其中'user'和'%'的含义。   
-
 ### 2. 导入genome-scores.csv文件时遇到的问题与解决：  
 
 建表正确命令：```create table genomescores (movieId int,tagId int,relevance double,primary key (movieId))engine=ndbcluster;```  
@@ -454,3 +454,4 @@ mysql是命令行客户端程序。
 [wmv-to-gif](https://cloudconvert.com/wmv-to-gif)  
 [Bootstrap-Introduction](https://getbootstrap.com/docs/4.3/getting-started/introduction/)  
 [BootstrapCDN](https://www.bootstrapcdn.com/)  
+[MySQL NDB Cluster 8.0](https://dev.mysql.com/doc/refman/8.0/en/mysql-cluster.html)
