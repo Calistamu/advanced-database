@@ -304,9 +304,9 @@ limit 20;
 版权：  
 ![](images/copyright.png)  
 
->video/result.wmv是清晰的美化后的演示视频,已转成gif如下所示:
+>video/new-result.mp4是清晰的美化后的演示视频,已转成gif如下所示:
 
-![](videos/result.gif)
+![](videos/new-result.gif)
 
 ## 实验问题
 ### 1. 物理机连接虚拟机报错
