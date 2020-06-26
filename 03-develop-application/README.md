@@ -212,16 +212,23 @@ MaxNoOfFiredTriggers：The default value of MaxNoOfFiredTriggers is 4000, which 
 
 #### 任务A
 ```
-select movies.title,ratings.rating,genomescores.tagId,genomescores.relevance
+select title,rating,
+substring_index(group_concat(tagId order by timestamp desc),',',3)tagId,
+substring_index(group_concat(relevance order by timestamp),',',3)relevance
+from 
+(select movies.title,ratings.rating,genomescores.tagId,genomescores.relevance,timestamp
 from ratings,genomescores,movies
 where ratings.userId=4
 and genomescores.movieId=movies.movieId
 and movies.movieId=ratings.movieId
 order by ratings.timestamp desc
-limit 3;
+)
+as tmp
+group by tmp.title;
 ```
 可以看到A任务查询时间：1.34sec  
 ![](images/select-a.png)
+
 #### 任务B
 * 优化：参考[MySQL带LIKE关键字的查询](https://blog.csdn.net/nangeali/article/details/74858171),like "%Story%"是最佳写法
 ```
@@ -413,6 +420,61 @@ where users.gender='%s'
 and users.userId=ratings.userId=movies.movieId=ratings.movieId
 order by ratings.rating
 limit 20;'''
+```
+### 9. 审题错误，任务A的select语句一开始写错了
+错误语句：
+```
+# first
+select movies.title,ratings.rating,genomescores.tagId,genomescores.relevance
+from ratings,genomescores,movies
+where ratings.userId=4
+and genomescores.movieId=movies.movieId
+and movies.movieId=ratings.movieId
+order by ratings.timestamp desc
+limit3;
+
+# second-得到电影名列表
+select *
+from 
+(select movies.title,ratings.rating,genomescores.tagId,genomescores.relevance
+from ratings,genomescores,movies
+where ratings.userId=4
+and genomescores.movieId=movies.movieId
+and movies.movieId=ratings.movieId
+order by ratings.timestamp desc
+)
+as tmp
+group by tmp.title;
+
+# third-得到关联度和tagid显示三个
+select *
+from 
+(select movies.title,ratings.rating,
+substring_index(group_concat(genomescores.tagId order by ratings.timestamp desc),',',3)tagId,
+substring_index(group_concat(genomescores.relevance order by ratings.timestamp),',',3)relevance
+from ratings,genomescores,movies
+where ratings.userId=4
+and genomescores.movieId=movies.movieId
+and movies.movieId=ratings.movieId
+)
+as tmp
+group by tmp.title;
+```
+正确语句
+```
+select title,rating,
+substring_index(group_concat(tagId order by timestamp desc),',',3)tagId,
+substring_index(group_concat(relevance order by timestamp),',',3)relevance
+from 
+(select movies.title,ratings.rating,genomescores.tagId,genomescores.relevance,timestamp
+from ratings,genomescores,movies
+where ratings.userId=4
+and genomescores.movieId=movies.movieId
+and movies.movieId=ratings.movieId
+order by ratings.timestamp desc
+)
+as tmp
+group by tmp.title;
 ```
 ## 实验总结
 1. 关于修改了my.cnf不生效问题总结。  

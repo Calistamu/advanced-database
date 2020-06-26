@@ -10,13 +10,19 @@ def index():
     print(userid)
     db = pymysql.connect("192.168.57.114","mudou","123456","movies" )
     cursor = db.cursor()
-    sql ='''select movies.title,ratings.rating,genomescores.tagId,genomescores.relevance 
-    from ratings,genomescores,movies 
-    where ratings.userId='%s'
-    and genomescores.movieId=movies.movieId
-    and movies.movieId=ratings.movieId
-    order by ratings.timestamp desc
-    limit 3;'''%userid
+    sql ='''select title,rating,
+substring_index(group_concat(tagId order by timestamp desc),',',3)tagId,
+substring_index(group_concat(relevance order by timestamp),',',3)relevance
+from 
+(select movies.title,ratings.rating,genomescores.tagId,genomescores.relevance,timestamp
+from ratings,genomescores,movies
+where ratings.userId='%s'
+and genomescores.movieId=movies.movieId
+and movies.movieId=ratings.movieId
+order by ratings.timestamp desc
+)
+as tmp
+group by tmp.title;'''%userid
     cursor.execute(sql)
     result1= cursor.fetchall()
     for row in result1:
@@ -95,13 +101,19 @@ def first():
     print(userid)
     db = pymysql.connect("192.168.57.114","mudou","123456","movies" )
     cursor = db.cursor()
-    sql ='''select movies.title,ratings.rating,genomescores.tagId,genomescores.relevance 
-    from ratings,genomescores,movies 
-    where ratings.userId='%s'
-    and genomescores.movieId=movies.movieId
-    and movies.movieId=ratings.movieId
-    order by ratings.timestamp desc
-    limit 3;'''%userid
+    sql ='''select title,rating,
+substring_index(group_concat(tagId order by timestamp desc),',',3)tagId,
+substring_index(group_concat(relevance order by timestamp),',',3)relevance
+from 
+(select movies.title,ratings.rating,genomescores.tagId,genomescores.relevance,timestamp
+from ratings,genomescores,movies
+where ratings.userId='%s'
+and genomescores.movieId=movies.movieId
+and movies.movieId=ratings.movieId
+order by ratings.timestamp desc
+)
+as tmp
+group by tmp.title;'''%userid
     cursor.execute(sql)
     result1 = cursor.fetchall()
     for row in result1:
