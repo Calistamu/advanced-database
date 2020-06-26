@@ -101,7 +101,7 @@ FLUSH PRIVILEGES;
 2. ssh文件传入虚拟机  
 3. 建库名为'movies'  
 ```create database movies；```
-![](images/show-database.png)
+![](images/show-databases.png)
 4. 建库建表导入数据
 * 将数据cp到/var/lib/mysql-files/内
 ```
