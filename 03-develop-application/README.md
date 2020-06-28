@@ -304,6 +304,16 @@ limit 20;
 版权：  
 ![](images/copyright.png)  
 
+### 压力测试
+
+#### 协程:同步非阻塞线程与异步协程
+![](images/pressure.png)   
+#### 协程:Gunicorn+Gevent
+![](images/gunicorn.png)
+#### 压力测试:Siege
+![](images/siege-1.png)
+![](images/siege-2.png)
+### 实验演示视频
 >video/new-result.mp4是清晰的美化后的演示视频,已转成gif如下所示:
 
 ![](videos/new-result.gif)
@@ -494,7 +504,7 @@ MySQL读取各个my.cnf配置文件的先后顺序是：
 参考：[mysqld — The MySQL Server](https://dev.mysql.com/doc/refman/8.0/en/mysqld.html)    
 区分总结：mysqld 是服务端程序。
 mysql是命令行客户端程序。
-3. 关于一个应用的启动、停止、重启都有service或脚本启动两种方式。  
+3. 关于一个应用的启动、停止、重启都有service或脚本启动两种方式。    
 
 ## 参考文献
 [【MySQL集群】——在Windows环境下配置MySQL集群](https://blog.csdn.net/huyuyang6688/article/details/47441743)  
@@ -517,3 +527,4 @@ mysql是命令行客户端程序。
 [Bootstrap-Introduction](https://getbootstrap.com/docs/4.3/getting-started/introduction/)  
 [BootstrapCDN](https://www.bootstrapcdn.com/)  
 [MySQL NDB Cluster 8.0](https://dev.mysql.com/doc/refman/8.0/en/mysql-cluster.html)
+
